@@ -1,6 +1,8 @@
 
 
 class GameBoard(object):
+    """ Represents a base board to play a game on which may be extended by more specific types of boards"""
+
     def __init__(self, length: int, width: int) -> None:
         """ Creates a game board given the length and width in number of squares """
         assert length > 0 and width > 0

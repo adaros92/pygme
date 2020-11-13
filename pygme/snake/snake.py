@@ -2,6 +2,7 @@ from pygme.game import movement
 
 
 class Node(object):
+    """ Represents each node in the body of the snake """
 
     def __init__(self, x_coordinate: int, y_coordinate: int, direction: str,
                  representation: str = '*', next_node=None, prev_node=None) -> None:
@@ -14,6 +15,7 @@ class Node(object):
 
 
 class Body(object):
+    """ Represents the body of the snake; Defines common functionality for growing and moving """
 
     def __init__(self, x_coordinate: int, y_coordinate: int, length: int = 1, direction: str = "left") -> None:
         self.x_coordinate = x_coordinate
@@ -22,6 +24,16 @@ class Body(object):
         self.tail = self.head
         self.length = length
         self.direction = direction
+
+    def change_direction(self, new_direction: str) -> None:
+        """ Changes the current body's direction of movement
+
+        :param new_direction - one of four possible directions to move the body in
+        """
+        opposite_direction = {"left": "right", "right": "left", "down": "up", "up": "down"}[self.direction]
+        # Only change the current direction if it's not opposite of the current direction
+        if new_direction != opposite_direction:
+            self.direction = new_direction
 
     @staticmethod
     def _assign_node_coordinate(prev_node: Node, new_node: Node):
@@ -63,25 +75,32 @@ class Body(object):
         self.length += by
 
     def slither(self, speed: float = 1.0) -> None:
+        """ Moves the body in its current direction of movement
+
+        :param speed - the speed to move the body in
+        """
         # Each node will assign its direction and coordinate to the next node
         tmp_node = self.head.next_node
         while tmp_node:
-            self._assign_node_coordinate(tmp_node.prev_node, tmp_node)
+            tmp_node.x_coordinate = tmp_node.prev_node.x_coordinate
+            tmp_node.y_coordinate = tmp_node.prev_node.y_coordinate
+            tmp_node = tmp_node.next_node
         # Once all other nodes have moved, the head moves to new location
         self.head.x_coordinate, self.head.y_coordinate = movement.resolve_movement(
             self.head.x_coordinate, self.head.y_coordinate, self.direction)
 
 
 class Snake(object):
+    """ Represents the snake itself  """
 
     def __init__(self, x_coordinate: int, y_coordinate: int) -> None:
         self.body = Body(x_coordinate, y_coordinate)
 
     def eat(self, food) -> None:
-        pass
+        self.body.grow()
 
-    def move(self, direction: str) -> None:
+    def move(self, new_direction: str) -> None:
         # Change direction
-        self.body.direction = direction
+        self.body.change_direction(new_direction)
         # Move
         self.body.slither()
