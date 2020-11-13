@@ -3,6 +3,27 @@ import random
 from pygme.snake import snake
 
 
+def test_create_body():
+    """ Tests snake.Body.__init__ method to ensure proper initial construction of the body object """
+    for _ in range(100):
+        random_length = random.randint(1, 100)
+        a_snake_body = snake.Body(x_coordinate=1, y_coordinate=2, length=random_length)
+        assert a_snake_body.length == random_length
+        count_of_nodes = 0
+        tmp_node = a_snake_body.head
+        while tmp_node:
+            count_of_nodes += 1
+            tmp_node = tmp_node.next_node
+        assert count_of_nodes == random_length
+
+
+def test_body_coordinates():
+    expected_coordinates = [(0, 0), (1, 0), (2, 0)]
+    a_snake_body = snake.Body(x_coordinate=0, y_coordinate=0, length=len(expected_coordinates))
+    coordinates = a_snake_body.coordinates
+    assert expected_coordinates == coordinates
+
+
 def test_change_direction():
     """ Tests snake.Body.change_direction method """
     for _ in range(100):
@@ -23,35 +44,6 @@ def test_change_direction():
             assert a_snake_body.direction == new_random_direction
 
 
-def test_assign_node_coordinate():
-    """ Tests snake.Body._assign_node_coordinate method """
-    for _ in range(100):
-        directions = ["up", "down", "left", "right"]
-        random_prev_direction = directions[random.randint(0, 3)]
-        # Create two random nodes going in random directions
-        prev_node = snake.Node(
-            x_coordinate=random.randint(-100, 100), y_coordinate=random.randint(-100, 100),
-            direction=random_prev_direction)
-        directions = ["up", "down", "left", "right"]
-        random_direction = directions[random.randint(0, 3)]
-        new_node = snake.Node(
-            x_coordinate=random.randint(-100, 100), y_coordinate=random.randint(-100, 100), direction=random_direction)
-        snake.Body._assign_node_coordinate(prev_node, new_node)
-        # Test that the assignment of coordinates to the new node based on the previous node works as expected
-        if random_prev_direction == "up":
-            assert new_node.x_coordinate == prev_node.x_coordinate and \
-                   new_node.y_coordinate == prev_node.y_coordinate - 1
-        elif random_prev_direction == "down":
-            assert new_node.x_coordinate == prev_node.x_coordinate and \
-                   new_node.y_coordinate == prev_node.y_coordinate + 1
-        elif random_prev_direction == "right":
-            assert new_node.x_coordinate == prev_node.x_coordinate + 1 and \
-                   new_node.y_coordinate == prev_node.y_coordinate
-        elif random_prev_direction == "left":
-            assert new_node.x_coordinate == prev_node.x_coordinate - 1 and \
-                   new_node.y_coordinate == prev_node.y_coordinate
-
-
 def test_grow_body():
     """ Tests snake.Body.grow method """
     # Check that the growth results in the right ending length
@@ -68,6 +60,8 @@ def test_grow_body():
         node_representation += tmp_node.representation
         tmp_node = tmp_node.next_node
     assert expected_node_representation == node_representation
+    # Ensure that string representation of body is equal to the expected representation after growing
+    assert "".join(str(a_snake_body).split("-")) == expected_node_representation
 
 
 def test_body_slither():

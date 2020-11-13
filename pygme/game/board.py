@@ -1,3 +1,5 @@
+from pygme.utils.display import clear_console
+from pygme.utils.validation import validate_grid_index
 
 
 class GameBoard(object):
@@ -16,19 +18,30 @@ class GameBoard(object):
         for i in range(self.length):
             self.board.append([None for _ in range(self.width)])
 
-    def print(self, empty_square: str = '0', occupied_square: str = '*') -> None:
+    def print(self, empty_square: str = '_') -> None:
         """ Prints out the board to stdout
 
         :param empty_square - how to represent empty squares on the board
-        :param occupied_square - how to represent occupied squares on the board
         """
         # Clear the terminal
-        import os
-        os.system('cls' if os.name == 'nt' else 'clear')
+        clear_console()
         # Print the current board
         for i in range(self.width):
             print(' '.join([empty_square if not self.board[square][i]
-                            else occupied_square for square in range(self.length)]))
+                            else self.board[square][i] for square in range(self.length)]))
+
+    def clear(self, empty_square: any = '_') -> None:
+        for i in range(self.width):
+            for j in range(self.length):
+                self.board[j][i] = empty_square
+
+    def refresh(self, coordinates: list, representation: str, empty_square: str = '_') -> None:
+        self.clear(empty_square)
+        for coordinate_tuple in coordinates:
+            x_coordinate, y_coordinate = coordinate_tuple[0], coordinate_tuple[1]
+            # Only refresh the board with the coordinate if the coordinate is valid
+            if validate_grid_index(self.length, self.width, x_coordinate, y_coordinate):
+                self.board[x_coordinate][y_coordinate] = representation
 
     def __repr__(self):
         return "GameBoard ({0} by {1})".format(self.length, self.width)
