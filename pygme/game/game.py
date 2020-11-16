@@ -28,5 +28,9 @@ class Game(ABC):
         pass
 
     @abstractmethod
+    def _is_game_over(self) -> bool:
+        pass
+
+    @abstractmethod
     def run(self, initialization_object: dict) -> dict:
         pass

@@ -85,6 +85,23 @@ class SnakeGame(Game):
         # Create a snake food collector and generator
         self.food_collection = food.FoodCollection(grid_width=board_width, grid_length=board_length)
 
+    def _is_game_over(self) -> bool:
+        game_over = False
+        end_game_coordinates = set()
+        current_snake_location = self.snake.current_location
+        for coordinate in current_snake_location:
+            if coordinate in end_game_coordinates:
+                game_over = True
+                break
+            elif coordinate[0] < 0 or coordinate[0] > self.board.length:
+                game_over = True
+                break
+            elif coordinate[1] < 0 or coordinate[1] > self.board.width:
+                game_over = True
+                break
+            #end_game_coordinates.add(coordinate)
+        return game_over
+
     def run(self, initialization_object: dict = None) -> dict:
         """ Game loop that accepts player events to move the snake around the board and keeps the state of the game
         until the game finishes
@@ -98,6 +115,7 @@ class SnakeGame(Game):
             current_snake_location = self.snake.current_location
             self.board.refresh(current_snake_location, representation=representation)
             self.board.print()
+            print("\nHit arrow keys on your keyboard to move the snake")
             # Get the current direction of the snake
             snake_direction = self.snake.current_direction
             # Get directional input from the user about where to go
@@ -106,5 +124,12 @@ class SnakeGame(Game):
                     snake_direction = key
                     break
             self.snake.move(snake_direction)
-            time.sleep(1)
+            game_over = self._is_game_over()
+            if game_over:
+                print("Game over! Hit <Enter> to exit.")
+                self.player.finished_game = True
+                self.player.wait_for_player_to_finish()
+                break
+            else:
+                time.sleep(.25)
         return {}

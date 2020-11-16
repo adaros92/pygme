@@ -18,7 +18,7 @@ class SnakePlayer(player.Player):
 
     def _detect_key_pressed(self) -> None:
         """ Detects presses of individual keys and marks those keys as pressed in common object """
-        while not self.finished_game:
+        while True:
             # Check to see if any keys have been pressed
             with Input(keynames='curtsies') as input_generator:
                 for e in input_generator:
@@ -28,10 +28,11 @@ class SnakePlayer(player.Player):
                         # If the player has pressed a key that is being tracked
                         if repr(e) == key:
                             # Signal that the key has been pressed in common object
-                            self.monitoring_lock.acquire()
                             self.key_pressed_map = {key: False for key in self.key_pressed_map}
                             self.key_pressed_map[pretty_key] = True
-                            self.monitoring_lock.release()
+                    break
+            if self.finished_game:
+                break
 
     def monitor_key_presses(self, key: str = None, how: str = "thread") -> None:
         """ Monitors the player's key presses in a separate thread from the rest of the program or in the same thread
@@ -47,5 +48,5 @@ class SnakePlayer(player.Player):
             self.thread = threading.Thread(target=self._detect_key_pressed, args=())
             self.thread.start()
 
-    def __del__(self):
+    def wait_for_player_to_finish(self):
         self.thread.join()
