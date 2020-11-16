@@ -2,6 +2,7 @@ import random
 import time
 
 from pygme.game.game import Game
+from pygme.game.player import Player
 from pygme.snake import snake
 from pygme.utils.display import clear_console
 from pygme.utils.validation import validate_user_input
@@ -16,6 +17,7 @@ class SnakeGame(Game):
         self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
         self.board = None
         self.snake = None
+        self.player = Player()
 
     def _validate_initialization(self, initialization_object: dict) -> None:
         """ Ensures that the given initialization_object containing parameters to run the Snake game has complete
@@ -78,6 +80,8 @@ class SnakeGame(Game):
         starting_length = {"easy": 2, "normal": 4, "hard": 8}[difficulty]
         self.snake = snake.Snake(
             x_coordinate=starting_x_coordinate, y_coordinate=starting_y_coordinate, starting_length=starting_length)
+        # Start monitoring player key presses
+        self.player.monitor_key_presses()
 
     def run(self, initialization_object: dict = None) -> dict:
         """ Game loop that accepts player events to move the snake around the board and keeps the state of the game
@@ -92,6 +96,13 @@ class SnakeGame(Game):
             current_snake_location = self.snake.current_location
             self.board.refresh(current_snake_location, representation=representation)
             self.board.print()
-            self.snake.move("up")
+            # Get the current direction of the snake
+            snake_direction = self.snake.current_direction
+            # Get directional input from the user about where to go
+            for key in ["left", "right", "up", "down"]:
+                if self.player.key_pressed_map[key]:
+                    snake_direction = key
+                    break
+            self.snake.move(snake_direction)
             time.sleep(1)
         return {}

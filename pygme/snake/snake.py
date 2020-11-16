@@ -135,6 +135,10 @@ class Snake(object):
     def current_location(self) -> list:
         return self.body.coordinates
 
+    @property
+    def current_direction(self) -> str:
+        return self.body.direction
+
     def eat(self, food) -> None:
         self.body.grow()
 
