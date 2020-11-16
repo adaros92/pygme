@@ -2,8 +2,7 @@ import random
 import time
 
 from pygme.game.game import Game
-from pygme.game.player import Player
-from pygme.snake import snake
+from pygme.snake import snake, player, food
 from pygme.utils.display import clear_console
 from pygme.utils.validation import validate_user_input
 
@@ -17,7 +16,8 @@ class SnakeGame(Game):
         self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
         self.board = None
         self.snake = None
-        self.player = Player()
+        self.food_collection = None
+        self.player = player.SnakePlayer()
 
     def _validate_initialization(self, initialization_object: dict) -> None:
         """ Ensures that the given initialization_object containing parameters to run the Snake game has complete
@@ -82,6 +82,8 @@ class SnakeGame(Game):
             x_coordinate=starting_x_coordinate, y_coordinate=starting_y_coordinate, starting_length=starting_length)
         # Start monitoring player key presses
         self.player.monitor_key_presses()
+        # Create a snake food collector and generator
+        self.food_collection = food.FoodCollection(grid_width=board_width, grid_length=board_length)
 
     def run(self, initialization_object: dict = None) -> dict:
         """ Game loop that accepts player events to move the snake around the board and keeps the state of the game

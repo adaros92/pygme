@@ -139,8 +139,8 @@ class Snake(object):
     def current_direction(self) -> str:
         return self.body.direction
 
-    def eat(self, food) -> None:
-        self.body.grow()
+    def eat(self, food_to_eat: any) -> None:
+        self.body.grow(food_to_eat.growth_value)
 
     def move(self, new_direction: str) -> None:
         # Change direction

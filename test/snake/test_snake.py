@@ -18,6 +18,7 @@ def test_create_body():
 
 
 def test_body_coordinates():
+    """ Tests snake.Body.coordinates property """
     expected_coordinates = [(0, 0), (1, 0), (2, 0)]
     a_snake_body = snake.Body(x_coordinate=0, y_coordinate=0, length=len(expected_coordinates))
     coordinates = a_snake_body.coordinates
