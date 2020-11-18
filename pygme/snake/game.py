@@ -90,16 +90,16 @@ class SnakeGame(Game):
         end_game_coordinates = set()
         current_snake_location = self.snake.current_location
         for coordinate in current_snake_location:
-            if coordinate in end_game_coordinates:
+            if coordinate[0] < 0 or coordinate[0] > self.board.length - 1:
                 game_over = True
                 break
-            elif coordinate[0] < 0 or coordinate[0] > self.board.length:
+            elif coordinate[1] < 0 or coordinate[1] > self.board.width - 1:
                 game_over = True
                 break
-            elif coordinate[1] < 0 or coordinate[1] > self.board.width:
+            elif coordinate in end_game_coordinates:
                 game_over = True
                 break
-            #end_game_coordinates.add(coordinate)
+            end_game_coordinates.add(coordinate)
         return game_over
 
     def run(self, initialization_object: dict = None) -> dict:
