@@ -103,10 +103,16 @@ class Body(object):
         """
         # Each node will assign its direction and coordinate to the next node
         tmp_node = self.head.next_node
+        tmp_x_coordinate = self.head.x_coordinate
+        tmp_y_coordinate = self.head.y_coordinate
         while tmp_node:
-            tmp_node.x_coordinate = tmp_node.prev_node.x_coordinate
-            tmp_node.y_coordinate = tmp_node.prev_node.y_coordinate
+            new_x_coordinate = tmp_node.x_coordinate
+            new_y_coordinate = tmp_node.y_coordinate
+            tmp_node.x_coordinate = tmp_x_coordinate
+            tmp_node.y_coordinate = tmp_y_coordinate
             tmp_node = tmp_node.next_node
+            tmp_x_coordinate = new_x_coordinate
+            tmp_y_coordinate = new_y_coordinate
         # Once all other nodes have moved, the head moves to new location
         self.head.x_coordinate, self.head.y_coordinate = movement.resolve_movement(
             self.head.x_coordinate, self.head.y_coordinate, self.direction)

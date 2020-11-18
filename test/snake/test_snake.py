@@ -90,7 +90,7 @@ def test_body_slither():
         node_count = 0
         while tmp_node:
             # Each node should have the same coordinates now as their previous node before the movement
-            assert tmp_node.x_coordinate == coordinates[0][0]
-            assert tmp_node.y_coordinate == coordinates[0][1]
+            assert tmp_node.x_coordinate == coordinates[node_count][0]
+            assert tmp_node.y_coordinate == coordinates[node_count][1]
             tmp_node = tmp_node.next_node
             node_count += 1
