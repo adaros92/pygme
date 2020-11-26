@@ -35,8 +35,10 @@ class GameBoard(object):
             for j in range(self.length):
                 self.board[j][i] = empty_square
 
-    def refresh(self, coordinates: list, representation: str, empty_square: str = '_') -> None:
-        self.clear(empty_square)
+    def refresh(self,
+                coordinates: list, representation: str, empty_square: str = '_', clear_board: bool = True) -> None:
+        if clear_board:
+            self.clear(empty_square)
         for coordinate_tuple in coordinates:
             x_coordinate, y_coordinate = coordinate_tuple[0], coordinate_tuple[1]
             # Only refresh the board with the coordinate if the coordinate is valid

@@ -17,6 +17,7 @@ class SnakeGame(Game):
         self.board = None
         self.snake = None
         self.food_collection = None
+        self.current_food = []
         self.player = player.SnakePlayer()
 
     def _validate_initialization(self, initialization_object: dict) -> None:
@@ -86,6 +87,7 @@ class SnakeGame(Game):
         self.food_collection = food.FoodCollection(grid_width=board_width, grid_length=board_length)
 
     def _is_game_over(self) -> bool:
+        """ Checks the board to see if the game is over """
         game_over = False
         end_game_coordinates = set()
         current_snake_location = self.snake.current_location
@@ -96,11 +98,38 @@ class SnakeGame(Game):
             elif coordinate[1] < 0 or coordinate[1] > self.board.width - 1:
                 game_over = True
                 break
+            '''
             elif coordinate in end_game_coordinates:
                 game_over = True
                 break
             end_game_coordinates.add(coordinate)
+            '''
         return game_over
+
+    def _get_food(self) -> None:
+        difficulty_to_frequency_map = {
+            "normal": 5,
+            "easy": 10,
+            "hard": 3
+        }
+        for current_food_obj in self.current_food:
+            if not current_food_obj.eaten:
+                return
+        if random.randint(1, difficulty_to_frequency_map[self.difficulty]) == 1:
+            generated_food_ok = False
+            generated_foods = []
+            while not generated_food_ok:
+                generated_food_ok = True
+                generated_foods = self.food_collection.generate()
+                for generated_food in generated_foods:
+                    # Don't place food in same place as Snake's head
+                    if (generated_food.x_coordinate == self.snake.current_location[0][0]
+                            or generated_food.y_coordinate == self.snake.current_location[0][1]):
+                        # Regenerate if food is located at Snake's head
+                        generated_food_ok = False
+            self.current_food = generated_foods
+            return
+        self.current_food = []
 
     def run(self, initialization_object: dict = None) -> dict:
         """ Game loop that accepts player events to move the snake around the board and keeps the state of the game
@@ -113,7 +142,19 @@ class SnakeGame(Game):
         representation = str(self.snake)[0]
         while True:
             current_snake_location = self.snake.current_location
+            self._get_food()
             self.board.refresh(current_snake_location, representation=representation)
+            for food_obj in self.current_food:
+                if (current_snake_location[0][0] == food_obj.x_coordinate
+                        and current_snake_location[0][1] == food_obj.y_coordinate):
+                    self.snake.eat(food_obj)
+                    food_obj.eaten = True
+                if not food_obj.eaten:
+                    self.board.refresh(
+                        [(food_obj.x_coordinate, food_obj.y_coordinate)],
+                        representation=food_obj.representation,
+                        clear_board=False
+                    )
             self.board.print()
             print("\nHit arrow keys on your keyboard to move the snake")
             # Get the current direction of the snake
