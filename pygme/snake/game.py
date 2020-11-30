@@ -2,7 +2,8 @@ import random
 import time
 
 from pygme.game.game import Game
-from pygme.snake import snake, player, food
+from pygme.game.player import Player
+from pygme.snake import snake, food
 from pygme.utils.display import clear_console
 from pygme.utils.validation import validate_user_input
 
@@ -18,7 +19,7 @@ class SnakeGame(Game):
         self.snake = None
         self.food_collection = None
         self.current_food = []
-        self.player = player.SnakePlayer()
+        self.player = Player()
 
     def _validate_initialization(self, initialization_object: dict) -> None:
         """ Ensures that the given initialization_object containing parameters to run the Snake game has complete
@@ -131,6 +132,33 @@ class SnakeGame(Game):
             return
         self.current_food = []
 
+    def _resolve_food(self, current_snake_location: list) -> None:
+        for food_obj in self.current_food:
+            if (current_snake_location[0][0] == food_obj.x_coordinate
+                    and current_snake_location[0][1] == food_obj.y_coordinate):
+                self.snake.eat(food_obj)
+                food_obj.eaten = True
+            if not food_obj.eaten:
+                self.board.refresh(
+                    [(food_obj.x_coordinate, food_obj.y_coordinate)],
+                    representation=food_obj.representation,
+                    clear_board=False
+                )
+
+    def _move_snake(self, current_direction: str) -> None:
+        # Get directional input from the user about where to go
+        snake_direction = current_direction
+        for key in ["left", "right", "up", "down"]:
+            if self.player.key_pressed_map[key]:
+                snake_direction = key
+                break
+        self.snake.move(snake_direction)
+
+    def _finish_game(self):
+        print("Game over! Hit <Enter> to play again or <q> to exit.")
+        self.player.finished_game = True
+        self.player.wait_for_player_to_finish()
+
     def run(self, initialization_object: dict = None) -> dict:
         """ Game loop that accepts player events to move the snake around the board and keeps the state of the game
         until the game finishes
@@ -144,32 +172,15 @@ class SnakeGame(Game):
             current_snake_location = self.snake.current_location
             self._get_food()
             self.board.refresh(current_snake_location, representation=representation)
-            for food_obj in self.current_food:
-                if (current_snake_location[0][0] == food_obj.x_coordinate
-                        and current_snake_location[0][1] == food_obj.y_coordinate):
-                    self.snake.eat(food_obj)
-                    food_obj.eaten = True
-                if not food_obj.eaten:
-                    self.board.refresh(
-                        [(food_obj.x_coordinate, food_obj.y_coordinate)],
-                        representation=food_obj.representation,
-                        clear_board=False
-                    )
+            self._resolve_food(current_snake_location)
             self.board.print()
             print("\nHit arrow keys on your keyboard to move the snake")
             # Get the current direction of the snake
             snake_direction = self.snake.current_direction
-            # Get directional input from the user about where to go
-            for key in ["left", "right", "up", "down"]:
-                if self.player.key_pressed_map[key]:
-                    snake_direction = key
-                    break
-            self.snake.move(snake_direction)
+            self._move_snake(snake_direction)
             game_over = self._is_game_over()
             if game_over:
-                print("Game over! Hit <Enter> to exit.")
-                self.player.finished_game = True
-                self.player.wait_for_player_to_finish()
+                self._finish_game()
                 break
             else:
                 time.sleep(.25)
