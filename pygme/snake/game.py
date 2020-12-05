@@ -19,7 +19,7 @@ class SnakeGame(Game):
         self.snake = None
         self.food_collection = None
         self.current_food = []
-        self.player = Player()
+        self.player = Player(computer=False)
 
     def _validate_initialization(self, initialization_object: dict) -> None:
         """ Ensures that the given initialization_object containing parameters to run the Snake game has complete
@@ -35,6 +35,8 @@ class SnakeGame(Game):
         board_width = initialization_object["board_width"]
         board_length = initialization_object["board_length"]
         difficulty = initialization_object["difficulty"]
+        # Required min coordinates for a game of snake
+        # TODO should be in config
         required_width = 10
         required_length = 10
         if initialization_object["board_width"] < required_width \
@@ -88,11 +90,16 @@ class SnakeGame(Game):
         self.food_collection = food.FoodCollection(grid_width=board_width, grid_length=board_length)
 
     def _is_game_over(self) -> bool:
-        """ Checks the board to see if the game is over """
+        """ Checks the board to see if the game is over
+
+        :returns True if the game is over, False otherwise
+        """
         game_over = False
         end_game_coordinates = set()
         current_snake_location = self.snake.current_location
         for coordinate in current_snake_location:
+            # check if any coordinate is outside of the board
+            # TODO: maybe only check if the head is outside for cases when snake grows into edge
             if coordinate[0] < 0 or coordinate[0] > self.board.length - 1:
                 game_over = True
                 break
@@ -108,17 +115,19 @@ class SnakeGame(Game):
         return game_over
 
     def _get_food(self) -> None:
+        """ Randomly generates food into the current grid """
+        # TODO this should be in config
         difficulty_to_frequency_map = {
-            "normal": 5,
-            "easy": 10,
-            "hard": 3
-        }
+            "normal": 5, "easy": 10, "hard": 3}
+        # If there is any current food on the grid that is not eaten then just return and don't generate new food
         for current_food_obj in self.current_food:
             if not current_food_obj.eaten:
                 return
+        # Randomly generate food based on frequency of appearance by difficulty level
         if random.randint(1, difficulty_to_frequency_map[self.difficulty]) == 1:
             generated_food_ok = False
             generated_foods = []
+            # Keep generating until the food falls in a spot where it's ok
             while not generated_food_ok:
                 generated_food_ok = True
                 generated_foods = self.food_collection.generate()
@@ -133,11 +142,20 @@ class SnakeGame(Game):
         self.current_food = []
 
     def _resolve_food(self, current_snake_location: list) -> None:
+        """ Makes the snake eat the food and marks the food as eaten when that happens, which makes the object
+        disappear from the grid; otherwise refresh the board with each uneaten piece of food
+
+        :param current_snake_location - a list of current snake coordinates
+        """
+        # Check each of the current food items on the grid
         for food_obj in self.current_food:
+            # If the snake's head is in the same square as the given food, then make the snake eat the food
             if (current_snake_location[0][0] == food_obj.x_coordinate
                     and current_snake_location[0][1] == food_obj.y_coordinate):
                 self.snake.eat(food_obj)
+                # Marking the food object as eaten will make it disappear from the grid
                 food_obj.eaten = True
+            # If the food still exists, show it again on the grid
             if not food_obj.eaten:
                 self.board.refresh(
                     [(food_obj.x_coordinate, food_obj.y_coordinate)],
@@ -146,15 +164,21 @@ class SnakeGame(Game):
                 )
 
     def _move_snake(self, current_direction: str) -> None:
+        """ Moves the snake along the grid and checks for user input entered in separate thread
+
+        :param current_direction - the direction the snake is current traveling in with respect to the grid
+        """
         # Get directional input from the user about where to go
         snake_direction = current_direction
         for key in ["left", "right", "up", "down"]:
+            # Change direction only if there is a valid directional key event in the key press map
             if self.player.key_pressed_map[key]:
                 snake_direction = key
                 break
+        # Move the snake in either the current or new direction depending on whether player pressed a key
         self.snake.move(snake_direction)
 
-    def _finish_game(self):
+    def _finish_game(self) -> None:
         print("Game over! Hit <Enter> to play again or <q> to exit.")
         self.player.finished_game = True
         self.player.wait_for_player_to_finish()

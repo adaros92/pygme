@@ -6,9 +6,10 @@ from curtsies import Input
 
 class Player(object):
 
-    def __init__(self, player_id: uuid.UUID = uuid.uuid1()):
+    def __init__(self, player_id: uuid.UUID = uuid.uuid1(), computer=True):
         self.player_id = str(player_id)
         self.finished_game = False
+        self.computer = computer
         self.keys = {"up": "'<UP>'", "right": "'<RIGHT>'", "left": "'<LEFT>'", "down": "'<DOWN>'"}
         self.event_to_key_map = {val: key for key, val in self.keys.items()}
         self.key_pressed_map = {key: False for key in self.keys}

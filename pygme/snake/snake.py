@@ -130,8 +130,15 @@ class Body(object):
 
 
 class Snake(object):
-    """ Represents the snake itself  """
+    """ Represents the snake itself
 
+    Constructor arguments:
+
+    :param x_coordinate - the starting x-coordinate of the snake's head
+    :param y_coordinate - the starting y-coordinate of the snake's head
+    :param starting_length - the snake's starting node length
+    :param starting_direction - the starting direction of movement that the snake will immediately head in
+    """
     def __init__(self,
                  x_coordinate: int, y_coordinate: int,
                  starting_length: int = 1, starting_direction: str = "left") -> None:
@@ -139,16 +146,39 @@ class Snake(object):
 
     @property
     def current_location(self) -> list:
+        """ Retrieves a list of coordinate tuples representing the snake's location on a snake grid
+
+        Example: [(0,1), (1,1)] is a 2 node long snake and on a 3 x 3 grid will look like this:
+
+        _ _ _
+        * * _
+        _ _ _
+
+        :returns a list of coordinate tuples
+        """
         return self.body.coordinates
 
     @property
     def current_direction(self) -> str:
+        """ Retrieves the snake's current direction of movement
+
+        :returns a direction string (left, up, right, down)
+        """
         return self.body.direction
 
     def eat(self, food_to_eat: any) -> None:
+        """ Eats a given food and makes the snake grow by the food's growth value
+
+        :param food_to_eat - a food object as defined in food.py
+        """
         self.body.grow(food_to_eat.growth_value)
 
     def move(self, new_direction: str) -> None:
+        """ Moves the snake by changing the direction to the new direction and altering the corresponding
+        coordinates based on that direction of movement
+
+        :param new_direction - the direction of movement (left, up, right, down)
+        """
         # Change direction
         self.body.change_direction(new_direction)
         # Move

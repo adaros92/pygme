@@ -58,3 +58,4 @@ def test_refresh_board():
     board_2_coordinates = [(0, 1), (1, 0)]
     test_board.refresh(board_2_coordinates, "*")
     assert expected_board_2 != test_board.board
+
