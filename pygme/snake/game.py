@@ -12,8 +12,8 @@ class SnakeGame(Game):
     """ Defines the main Snake game loop and initialization functionality """
 
     def __init__(self,
-                 name: str = "Snake", number_of_players: int = 1, levels: int = 10, difficulty: str = "normal") -> None:
-        super().__init__(name, number_of_players, levels, difficulty)
+                 config: dict, name: str = "Snake", number_of_players: int = 1, difficulty: str = "normal") -> None:
+        super().__init__(name, config, number_of_players, difficulty)
         self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
         self.board = None
         self.snake = None

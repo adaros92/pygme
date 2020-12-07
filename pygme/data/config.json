@@ -1,0 +1,17 @@
+{
+  "snake": {
+    "something": 1
+  },
+  "battleship": {
+    "ship_types": ["carrier", "battleship", "destroyer", "submarine", "patrol"],
+    "size_by_type": {
+      "carrier": 5, "battleship": 4, "destroyer": 3, "submarine": 3, "patrol": 2
+    }
+  },
+  "tetris": {
+    "something": 1
+  },
+  "adventure": {
+    "something": 1
+  }
+}

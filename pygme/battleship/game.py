@@ -7,11 +7,12 @@ from pygme.game.game import Game
 class BattleshipGame(Game):
 
     def __init__(self,
-                 name: str = "Battleship", number_of_players: int = 2, levels: int = 1, difficulty: str = "normal"):
-        super().__init__(name, number_of_players, levels, difficulty)
+                 config: dict, name: str = "Battleship", number_of_players: int = 2, difficulty: str = "normal"):
+        super().__init__(name, config, number_of_players, difficulty)
         self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
         self.board = None
-        self.ships = {}
+        self.ship_fleet = ships.ShipFleet(config)
+        print(self.ship_fleet)
         self.players = [player.BattleshipPlayer() for _ in range(number_of_players)]
 
     def _validate_initialization(self, initialization_object: dict) -> None:
@@ -24,6 +25,6 @@ class BattleshipGame(Game):
     def _is_game_over(self) -> bool:
         pass
 
-    def run(self, initialization_object: dict) -> dict:
+    def run(self, initialization_object: dict = None) -> dict:
         self._initialize(initialization_object)
         return {}

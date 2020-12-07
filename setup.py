@@ -26,6 +26,9 @@ setup(
     packages=find_packages(exclude=("test",)),
     name='pygme',
     python_requires='>=3.6',
+    package_data={
+            'pygme': ['data/*']
+        },
     entry_points={
         'console_scripts': [
                 'pygme = pygme.__main__:main'

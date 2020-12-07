@@ -9,10 +9,9 @@ class Game(ABC):
 
     DIFFICULTY_TYPES = {"easy", "normal", "hard"}
 
-    def __init__(self, name: str, number_of_players: int = 1, levels: int = 10, difficulty: str = "normal") -> None:
+    def __init__(self, name: str, config: dict, number_of_players: int = 1, difficulty: str = "normal") -> None:
         self.name = name
         self.number_of_players = number_of_players
-        self.levels = levels
         self.difficulty = difficulty
         self.players = []
         self.player_turn = 0
