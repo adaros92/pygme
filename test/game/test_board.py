@@ -28,14 +28,14 @@ def test_clear():
         # Construct random board
         rand_length = random.randint(1, 100)
         rand_width = random.randint(1, 10)
-        test_board = board.GameBoard(rand_length + 1, rand_width + 1)
+        test_board = board.GameBoard(rand_length + 1, rand_width + 1, empty_square=0)
         # Fill the boards at random places
         for fill_iter in range(10):
             random_x_index = random.randint(0, rand_length - 1)
             random_y_index = random.randint(0, rand_width - 1)
             test_board.board[random_x_index][random_y_index] = '*'
         # Clear the board
-        test_board.clear(empty_square=0)
+        test_board.clear()
         # Ensure all squares are empty
         for column in test_board.board:
             assert sum(column) == 0

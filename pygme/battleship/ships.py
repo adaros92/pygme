@@ -7,10 +7,12 @@ class Ship(object):
 
     :param ship_type - one of the possible ship types in the game
     :param size - the size of the ship in number of grid squares
+    :param representation - how the ship will be represented on a Battleship grid
     """
-    def __init__(self, ship_type, size) -> None:
+    def __init__(self, ship_type, size, representation="0") -> None:
         self.ship_type = ship_type
         self.size = size
+        self.representation = representation
         # Ship starts out without being placed on the grid and no destroyed segments
         self.coordinates = set()
         self.destroyed_coordinates = set()
