@@ -1,32 +1,49 @@
 
 
 class Ship(object):
+    """ Represents a ship in the game of Battleship
 
-    def __init__(self, ship_type, size):
+    Constructor arguments:
+
+    :param ship_type - one of the possible ship types in the game
+    :param size - the size of the ship in number of grid squares
+    """
+    def __init__(self, ship_type, size) -> None:
         self.ship_type = ship_type
         self.size = size
+        # Ship starts out without being placed on the grid and no destroyed segments
         self.coordinates = set()
         self.destroyed_coordinates = set()
         self.placed = False
         self.destroyed = False
 
-    def __repr__(self):
-        return "{0} of size {1} with coordinates {2}".format(self.ship_type, self.size, self.coordinates)
-
-    def __str__(self):
-        return "{0} of size {1}".format(self.ship_type, self.size)
-
     def is_destroyed(self) -> bool:
+        """ Checks whether the ship has been destroyed and updates state if so
+
+        :returns True if the ship has been destroyed, False otherwise
+        """
         self.destroyed = False
         coordinate_length, destroyed_length = len(self.coordinates), len(self.destroyed_coordinates)
         if coordinate_length > 0 and destroyed_length > 0 and len(self.coordinates - self.destroyed_coordinates) == 0:
             self.destroyed = True
         return self.destroyed
 
+    def __repr__(self) -> str:
+        return "{0} of size {1} with coordinates {2}".format(self.ship_type, self.size, self.coordinates)
+
+    def __str__(self) -> str:
+        return "{0} of size {1}".format(self.ship_type, self.size)
+
 
 class ShipFleet(dict):
+    """ Keeps and manages a collection of ships in a dictionary where each ship type is the key and values are ship
+    objects
 
-    def __init__(self, config: dict):
+    Constructor arguments:
+
+    :param config - a configuration dictionary containing information on ship types, sizes, etc.
+    """
+    def __init__(self, config: dict) -> None:
         self.destroyed = False
         assert "ship_types" in config and "size_by_type" in config
         ship_types = config.get("ship_types", set())
@@ -36,22 +53,32 @@ class ShipFleet(dict):
         })
 
     def is_destroyed(self) -> bool:
+        """ Checks whether the fleet has been destroyed and updates state accordingly
+
+        :returns True if every ship in the fleet has been destroyed, False if at least 1 has not been destroyed
+        """
         self.destroyed = True
         for _, ship in self.items():
-            ship_destroyed = ship.is_detroyed
+            ship_destroyed = ship.is_destroyed()
             # If any one ship is still alive then the fleet is also still alive
             if not ship_destroyed:
                 self.destroyed = False
         return self.destroyed
 
-    def _print(self, print_function):
+    def _print(self, print_function) -> str:
+        """ Utility method for repr and str magic methods to print the fleet and each ship in it
+
+        :param print_function - either repr or str to use for representing individual ship objects when printing the
+            fleet object
+        :returns a string representation of the fleet collection object
+        """
         return_str = "Ship fleet: "
         for _, ship in self.items():
             return_str += "{0}, ".format(print_function(ship))
         return return_str[:-2]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self._print(repr)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self._print(str)
