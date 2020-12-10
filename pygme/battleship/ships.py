@@ -30,6 +30,13 @@ class Ship(object):
             self.destroyed = True
         return self.destroyed
 
+    def place_ship(self, coordinates) -> None:
+        for coordinate in coordinates:
+            self.coordinates.add(coordinate)
+        self.placed = True
+        self.destroyed = False
+        self.destroyed_coordinates = set()
+
     def __repr__(self) -> str:
         return "{0} of size {1} with coordinates {2}".format(self.ship_type, self.size, self.coordinates)
 

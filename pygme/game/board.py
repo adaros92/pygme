@@ -1,5 +1,6 @@
 from pygme.utils.display import clear_console
 from pygme.utils.validation import validate_grid_index
+from pygme.utils.space import are_coordinates_between_limits
 
 
 class GameBoard(object):
@@ -18,6 +19,12 @@ class GameBoard(object):
         self.empty_square = empty_square
         self.board = []
         self._create_board()
+
+    def is_square_clear(self, coordinate: tuple) -> bool:
+        assert are_coordinates_between_limits(coordinate, self.width, self.length)
+        if self.board[coordinate[0]][coordinate[1]] == self.empty_square:
+            return True
+        return False
 
     def _create_board(self) -> None:
         """ Creates an empty 2D list with the given board dimensions"""

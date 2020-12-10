@@ -13,6 +13,21 @@ def test_get_coordinates_between_limits():
         assert 0 <= coordinates[1] <= grid_width - 1
 
 
+def test_are_coordinates_between_limits():
+    """ Tests utils.space.are_coordinates_between_limits function """
+    grid_width = 25
+    grid_length = 10
+    coordinates = (5, 10)
+    assert space.are_coordinates_between_limits(coordinates, grid_length=grid_length, grid_width=grid_width)
+    grid_width = 10
+    assert not space.are_coordinates_between_limits(coordinates, grid_length=grid_length, grid_width=grid_width)
+    for _ in range(100):
+        grid_width = random.randint(1, 100)
+        grid_length = random.randint(1, 100)
+        coordinates = space.get_coordinates_between_limits(grid_width=grid_width, grid_length=grid_length)
+        assert space.are_coordinates_between_limits(coordinates, grid_width, grid_length)
+
+
 def test_are_contiguous_coordinates():
     """ Tests utils.space.are_contiguous_coordinates function """
     coordinates = [(0, 1), (1, 1), (2, 1)]

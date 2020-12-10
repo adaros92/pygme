@@ -12,7 +12,6 @@ class BattleshipGame(Game):
         self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
         self.board = None
         self.ship_fleet = ships.ShipFleet(config)
-        print(self.ship_fleet)
         self.players = [player.BattleshipPlayer() for _ in range(number_of_players)]
 
     def _validate_initialization(self, initialization_object: dict) -> None:

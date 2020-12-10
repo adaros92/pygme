@@ -7,6 +7,11 @@ def validate_user_input(input_variable: str, value_received: any, expected_type:
         raise ValueError("Your input for {0} cannot be represented as {1}".format(input_variable, expected_type_name))
 
 
+def validate_out_of_possible_options(user_input: str, options: set):
+    if user_input not in options:
+        raise ValueError("Your input of {0} is not one of {1}".format(user_input, options))
+
+
 def validate_grid_index(grid_length: int, grid_width: int, x_coordinate: int, y_coordinate: int) -> bool:
     if x_coordinate < 0 or x_coordinate >= grid_length or y_coordinate < 0 or y_coordinate >= grid_width:
         return False
