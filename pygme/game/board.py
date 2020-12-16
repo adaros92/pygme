@@ -12,7 +12,7 @@ class GameBoard(object):
     :param width - the width of the board to create
     :param empty_square - how to represent empty squares on the board
     """
-    def __init__(self, length: int, width: int, empty_square="_") -> None:
+    def __init__(self, length: int, width: int, empty_square: str = "_") -> None:
         assert length > 0 and width > 0
         self.length = length
         self.width = width

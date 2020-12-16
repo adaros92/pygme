@@ -1,7 +1,4 @@
-import random
-
 from pygme.battleship import player, ships, game
-from pygme.game import board
 
 
 BATTLESHIP_TEST_CONFIG = {

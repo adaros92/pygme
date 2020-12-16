@@ -1,5 +1,5 @@
-from pygme.battleship import ships
-from pygme.game import player, board
+from pygme.battleship import ships, board
+from pygme.game import player
 from pygme.utils import space, validation
 
 
@@ -8,18 +8,36 @@ class BattleshipPlayer(player.Player):
     def __init__(self, computer=False):
         super().__init__(computer=computer)
 
-    def guess(self, game_board: board.GameBoard):
-        pass
+    def guess(self, game_board: board.BattleshipBoard) -> tuple:
+        """ Each player will guess the other's ships' locations """
+        # Accept input from player if they're not the computer
+        input_valid = False
+        coordinate = None
+        if not self.computer:
+            while not input_valid:
+                x_coordinate_guess = input("Enter the x-coordinate of the square to attack:")
+                y_coordinate_guess = input("Enter the y-coordinate of the square to attach:")
+                coordinate = (x_coordinate_guess, y_coordinate_guess)
+                if space.are_coordinates_between_limits(coordinate, game_board.width, game_board.length):
+                    input_valid = True
+        else:
+            coordinate = space.get_coordinates_between_limits(game_board.width, game_board.length)
+        return coordinate
 
     @staticmethod
-    def _validate_ship_placement(coordinates, game_board: board.GameBoard):
+    def _validate_ship_placement(coordinates: list, game_board: board.BattleshipBoard) -> None:
+        """ Validates that the given coordinates for ship placement on the given board are valid
+
+        :param coordinates - a list of x and y coordinate tuples to check the validity of
+        :param game_board - the board object to place the given coordinates in
+        """
         for coordinate in coordinates:
             if not space.are_coordinates_between_limits(coordinate, game_board.width, game_board.length):
                 raise ValueError("The location of the ship is not within the boundaries of the grid")
             if not game_board.is_square_clear(coordinate):
                 raise ValueError("The location of the ship overlaps another ship")
 
-    def _place_ship(self, ship: ships.Ship, game_board: board.GameBoard):
+    def _place_ship(self, ship: ships.Ship, game_board: board.BattleshipBoard):
         ship_placement_ok = False
         ship_directions = {"right", "down"}
         while not ship_placement_ok:
@@ -42,16 +60,16 @@ class BattleshipPlayer(player.Player):
                 coordinates = space.get_contiguous_coordinates(starting_coordinate, direction, ship.size)
                 # Raise exception if any of the ships go beyond the board or if they overlap others
                 self._validate_ship_placement(coordinates, game_board)
-                # Update the board with the new ship
-                game_board.refresh(coordinates, ship.representation, clear_board=False)
                 # Let ship object know that it is placed on a grid
                 ship.place_ship(coordinates)
                 ship_placement_ok = True
+                # Update the board with the new ship
+                game_board.place_ship(ship)
             except ValueError as e:
                 if not self.computer:
                     print(e)
                 continue
 
-    def place_ships(self, fleet: ships.ShipFleet, game_board: board.GameBoard):
+    def place_ships(self, fleet: ships.ShipFleet, game_board: board.BattleshipBoard):
         for ship_name, ship in fleet.items():
             self._place_ship(ship, game_board)

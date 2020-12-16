@@ -1,6 +1,4 @@
-import random
-
-from pygme.battleship import ships, player
+from pygme.battleship import ships, player, board
 from pygme.game.game import Game
 
 
@@ -13,6 +11,19 @@ class BattleshipGame(Game):
         self.board = None
         self.ship_fleet = ships.ShipFleet(config)
         self.players = [player.BattleshipPlayer() for _ in range(number_of_players)]
+
+    @staticmethod
+    def construct_board(length: int, width: int, game_board: board.BattleshipBoard = None) -> board.BattleshipBoard:
+        """ Constructs a battleship board for the game to run on
+
+        :param length - the length of the board
+        :param width - the width of the board
+        :param game_board - an optional board to use instead of instantiating one
+        :returns a game board to play Battleship on
+        """
+        if not game_board:
+            game_board = board.BattleshipBoard(length, width)
+        return game_board
 
     def _validate_initialization(self, initialization_object: dict) -> None:
         pass

@@ -8,11 +8,13 @@ class Ship(object):
     :param ship_type - one of the possible ship types in the game
     :param size - the size of the ship in number of grid squares
     :param representation - how the ship will be represented on a Battleship grid
+    :param damaged_representation - how damaged ship segments will be represented on a Battleship grid
     """
-    def __init__(self, ship_type, size, representation="0") -> None:
+    def __init__(self, ship_type, size, representation="0", damaged_representation="*") -> None:
         self.ship_type = ship_type
         self.size = size
         self.representation = representation
+        self.damaged_representation = damaged_representation
         # Ship starts out without being placed on the grid and no destroyed segments
         self.coordinates = set()
         self.destroyed_coordinates = set()
@@ -30,12 +32,31 @@ class Ship(object):
             self.destroyed = True
         return self.destroyed
 
-    def place_ship(self, coordinates) -> None:
+    def place_ship(self, coordinates: list) -> None:
+        """ Places the current ship by accepting the given coordinates (assumes ship is being placed on a 2D grid)
+
+        :param coordinates - a list of x and y coordinate tuples
+        """
         for coordinate in coordinates:
             self.coordinates.add(coordinate)
         self.placed = True
         self.destroyed = False
         self.destroyed_coordinates = set()
+
+    def get_representation(self, coordinate: tuple) -> str:
+        representation = None
+        if coordinate in self.destroyed_coordinates:
+            representation = self.damaged_representation
+        elif coordinate in self.coordinates:
+            representation = self.representation
+        return representation
+
+    def take_damage(self, coordinate: tuple) -> tuple:
+        successful_hit, destroyed = False, False
+        if coordinate in self.coordinates and coordinate not in self.destroyed_coordinates:
+            self.destroyed_coordinates.add(coordinate)
+            successful_hit, destroyed = True, self.is_destroyed()
+        return successful_hit, destroyed
 
     def __repr__(self) -> str:
         return "{0} of size {1} with coordinates {2}".format(self.ship_type, self.size, self.coordinates)
@@ -73,6 +94,31 @@ class ShipFleet(dict):
             if not ship_destroyed:
                 self.destroyed = False
         return self.destroyed
+
+    def ship_is_hit(self, coordinate: tuple) -> bool:
+        """ Checks whether a ship in the fleet has already been hit at the given coordinate
+
+        :param coordinate - a tuple of x and y coordinates to check for hits
+        :returns True if a ship has already been hit, False otherwise
+        """
+        for _, ship in self.items():
+            if coordinate in ship.destroyed_coordinates:
+                return True
+        return False
+
+    def accept_attack(self, coordinate: tuple) -> tuple:
+        """ Accepts an attack on the fleet by transmitting the damage to a ship in the fleet
+
+        :param coordinate - a tuple of x and y coordinates that are being attacked
+        :returns whether there has been a successful hit and a ship has been destroyed and the new ship segment repr
+        """
+        successful_hit, ship_destroyed, representation = False, False, None
+        for _, ship in self.items():
+            successful_hit, ship_destroyed = ship.take_damage(coordinate)
+            if successful_hit:
+                representation = ship.get_representation(coordinate)
+                break
+        return successful_hit, ship_destroyed, representation
 
     def _print(self, print_function) -> str:
         """ Utility method for repr and str magic methods to print the fleet and each ship in it
