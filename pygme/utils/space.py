@@ -21,7 +21,7 @@ def are_coordinates_between_limits(coordinates: tuple, grid_width: int, grid_len
     :param grid_length - the length of the grid in number of squares
     :returns True if the coordinates are within the grid dimensions, False otherwise
     """
-    x_coordinate, y_coordinate = coordinates[0], coordinates[1]
+    x_coordinate, y_coordinate = int(coordinates[0]), int(coordinates[1])
     if (0 <= y_coordinate < grid_width) and (0 <= x_coordinate < grid_length):
         return True
     return False
@@ -44,7 +44,6 @@ def get_random_directions(possible_directions: list, number_of_directions: int) 
     return directions
 
 
-
 def are_contiguous_coordinates(coordinates: list) -> bool:
     """ Checks if the given list of coordinate tuples are in a contiguous sequence of each other in either the X or
     Y direction (diagonals not considered contiguous)
@@ -59,8 +58,8 @@ def are_contiguous_coordinates(coordinates: list) -> bool:
     x_coordinates = set()
     coordinate_length = len(coordinates)
     for coordinate_tuple in coordinates:
-        y_coordinates.add(coordinate_tuple[1])
-        x_coordinates.add(coordinate_tuple[0])
+        y_coordinates.add(int(coordinate_tuple[1]))
+        x_coordinates.add(int(coordinate_tuple[0]))
     # To be contiguous in either x or y direction, at least one axis needs to be constant (1 unique value only)
     if len(y_coordinates) > 1 and len(x_coordinates) > 1:
         return False
@@ -82,7 +81,7 @@ def get_contiguous_coordinates(starting_coordinate: tuple, direction: str, size:
     :returns a list of coordinate tuples in a contiguous sequence
     """
     assert direction in {"right", "down", "left", "up"}
-    coordinate_list = [starting_coordinate]
+    coordinate_list = [(int(starting_coordinate[0]), int(starting_coordinate[1]))]
     for idx in range(size - 1):
         if direction == "right":
             new_coordinate = (coordinate_list[idx][0] + 1, coordinate_list[idx][1])

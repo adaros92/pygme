@@ -15,6 +15,7 @@ class Player(object):
         self.key_pressed_map = {key: False for key in self.keys}
         self.monitoring_lock = threading.Lock()
         self.thread = None
+        self.winner = False
 
     def _detect_key_pressed(self) -> None:
         """ Detects presses of individual keys and marks those keys as pressed in common object """

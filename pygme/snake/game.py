@@ -4,8 +4,6 @@ import time
 from pygme.game.game import Game
 from pygme.game.player import Player
 from pygme.snake import snake, food
-from pygme.utils.display import clear_console
-from pygme.utils.validation import validate_user_input
 
 
 class SnakeGame(Game):
@@ -52,28 +50,7 @@ class SnakeGame(Game):
 
         :param initialization_object - a dictionary containing game parameter names and their values for operation
         """
-        # Get input from the user if no initialization_object is provided
-        if not initialization_object:
-            initialization_object = {}
-            pre_prompt = ""
-            while True:
-                clear_console()
-                try:
-                    print("{0}Provide your inputs to begin your game of Snake. Difficulty levels: easy, normal, hard\n"
-                          .format(pre_prompt))
-                    for required_input, input_type in self.required_inputs.items():
-                        input_val = input("Enter a value for {0}: ".format(required_input))
-                        initialization_object[required_input] = validate_user_input(
-                            required_input, input_val, input_type)
-                    self._validate_initialization(initialization_object)
-                    break
-                except Exception as e:
-                    pre_prompt = str(e) + "\n\n"
-                    pass
-        # Validate the input passed through the method arguments
-        else:
-            self._validate_initialization(initialization_object)
-        # Create the board
+        initialization_object = self._get_user_input(initialization_object)
         board_width = initialization_object["board_width"]
         board_length = initialization_object["board_length"]
         difficulty = initialization_object["difficulty"]

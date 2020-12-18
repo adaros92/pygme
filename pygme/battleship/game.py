@@ -7,10 +7,10 @@ class BattleshipGame(Game):
     def __init__(self,
                  config: dict, name: str = "Battleship", number_of_players: int = 2, difficulty: str = "normal"):
         super().__init__(name, config, number_of_players, difficulty)
-        self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
-        self.board = None
-        self.ship_fleet = ships.ShipFleet(config)
         self.players = [player.BattleshipPlayer() for _ in range(number_of_players)]
+        # Each player will have their own board and fleet of ships to play with
+        self.boards = {battleship_player.player_id: None for battleship_player in self.players}
+        self.ship_fleets = {battleship_player.player_id: ships.ShipFleet(config) for battleship_player in self.players}
 
     @staticmethod
     def construct_board(length: int, width: int, game_board: board.BattleshipBoard = None) -> board.BattleshipBoard:
@@ -31,10 +31,42 @@ class BattleshipGame(Game):
     def _initialize(self, initialization_object: dict = None) -> None:
         # Assign a random player to be the human player
         self._assign_human_player()
+        # Get input from the user if no initialization_object is provided
+        initialization_object = self._get_user_input(initialization_object)
+        board_width = initialization_object["board_width"]
+        board_length = initialization_object["board_length"]
+        difficulty = initialization_object["difficulty"]
+        self.boards = {player_id: self.construct_board(board_length, board_width)
+                       for player_id, _ in self.boards.items()}
+        self.human_player.place_ships(
+            fleet=self.ship_fleets[self.human_player.player_id],
+            game_board=self.boards[self.human_player.player_id]
+        )
 
     def _is_game_over(self) -> bool:
-        pass
+        """ Checks whether the game has finished and determines a winner
+
+        :returns True if the game has finished, False otherwise
+        """
+        for player_in_game in self.players:
+            if self.ship_fleets[player_in_game.player_id].is_destroyed():
+                player_in_game.winner = False
+                return True
+        return False
 
     def run(self, initialization_object: dict = None) -> dict:
         self._initialize(initialization_object)
+        # Keep running the game as long as no one has lost
+        while not self._is_game_over():
+            # Get the next player in line to play
+            battleship_player = self._next_player()
+            game_board = self.boards[battleship_player.player_id]
+            game_board.print(include_reference=True)
+            # Ask the player to guess coordinates to attack
+            attack_coordinate = battleship_player.guess(game_board)
+            # Attack the player's fleet on their board
+            player_board = self.boards[battleship_player.player_id]
+            player_fleet = self.ship_fleets[battleship_player.player_id]
+            successful_hit, ship_destroyed, already_hit = player_board.attack(attack_coordinate, player_fleet)
+        self.print_result()
         return {}

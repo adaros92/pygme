@@ -44,15 +44,29 @@ class Ship(object):
         self.destroyed_coordinates = set()
 
     def get_representation(self, coordinate: tuple) -> str:
+        """ Returns the ship segment representation at the given coordinate depending on whether that segment is
+        destroyed or not
+
+        :param coordinate - a tuple of x-coordinate, y-coordinate for the segment to return
+        :returns a character representation of the ship's segment at the given coordinate
+        """
         representation = None
+        # Segment is destroyed so return the damaged representation
         if coordinate in self.destroyed_coordinates:
             representation = self.damaged_representation
+        # Segment is intact so ship is represented normally
         elif coordinate in self.coordinates:
             representation = self.representation
         return representation
 
     def take_damage(self, coordinate: tuple) -> tuple:
+        """ Accepts damage at the given coordinate
+
+        :param coordinate - tuple of x-coordinate, y-coordinate that was attacked
+        :returns a tuple containing booleans for whether the attack was successful and if the ship has been destroyed
+        """
         successful_hit, destroyed = False, False
+        # Take damage only if part of the ship is on the coordinate
         if coordinate in self.coordinates and coordinate not in self.destroyed_coordinates:
             self.destroyed_coordinates.add(coordinate)
             successful_hit, destroyed = True, self.is_destroyed()

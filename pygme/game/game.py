@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 import random
 
 from pygme.game.board import GameBoard
-from pygme.game.player import Player
+from pygme.utils.display import clear_console
+from pygme.utils.validation import validate_user_input
 
 
 class Game(ABC):
@@ -14,7 +15,10 @@ class Game(ABC):
         self.number_of_players = number_of_players
         self.difficulty = difficulty
         self.players = []
+        self.human_player = None
         self.player_turn = 0
+        self.config = config
+        self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
 
     def _assign_human_player(self):
         """ Makes a random player in the list of players the human player """
@@ -23,8 +27,32 @@ class Game(ABC):
         # Assign a random player in that list to be the human player
         # This player will require input from the current user while the others will play on their own
         self.players[random_index].computer = False
+        self.human_player = self.players[random_index]
 
-    def _next_player(self) -> Player:
+    def _get_user_input(self, initialization_object: dict = None):
+        if not initialization_object:
+            initialization_object = {}
+            pre_prompt = ""
+            while True:
+                clear_console()
+                try:
+                    print("{0}Provide your inputs to begin your game. Difficulty levels: easy, normal, hard\n"
+                          .format(pre_prompt))
+                    for required_input, input_type in self.required_inputs.items():
+                        input_val = input("Enter a value for {0}: ".format(required_input))
+                        initialization_object[required_input] = validate_user_input(
+                            required_input, input_val, input_type)
+                    self._validate_initialization(initialization_object)
+                    break
+                except Exception as e:
+                    pre_prompt = str(e) + "\n\n"
+                    pass
+        # Validate the input passed through the method arguments
+        else:
+            self._validate_initialization(initialization_object)
+        return initialization_object
+
+    def _next_player(self):
         """ Retrieves the next player in line to play
 
         :returns a player object retrieved from the list of current players
@@ -40,8 +68,19 @@ class Game(ABC):
             self.player_turn += 1
         return self.players[self.player_turn]
 
+    def print_result(self) -> None:
+        """ Prints the result of the game to the user """
+        print("Losers:\n")
+        for player in self.players:
+            if not player.winner:
+                print(player.player_id)
+        print("Winners:\n")
+        for player in self.players:
+            if player.winner:
+                print(player.player_id)
+
     @staticmethod
-    def construct_board(length, width, board: GameBoard = None) -> GameBoard:
+    def construct_board(length: int, width: int, board: GameBoard = None) -> GameBoard:
         if not board:
             board = GameBoard(length, width)
         return board

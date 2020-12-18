@@ -31,14 +31,43 @@ class GameBoard(object):
         for i in range(self.length):
             self.board.append([self.empty_square for _ in range(self.width)])
 
-    def print(self) -> None:
+    def print(self, include_reference=False) -> None:
         """ Prints out the board to stdout """
         # Clear the terminal
         clear_console()
-        # Print the current board
+        # Add an index before each column if applicable
+        if include_reference:
+            header_items = [str(x) for x in range(self.length)]
+            header = "    "
+            for item in header_items:
+                if len(item) == 1:
+                    header += item + "   "
+                else:
+                    header += item + "  "
+            print(header)
+        # Print the board
         for i in range(self.width):
-            print(' '.join([self.empty_square if not self.board[square][i]
-                            else self.board[square][i] for square in range(self.length)]))
+            # Print an index before each row if applicable
+            header = ""
+            space = ""
+            if include_reference:
+                header = "{0}".format(i)
+                if len(header) == 1:
+                    space = " " * 3
+                else:
+                    space = " " * 2
+                row_string = ""
+                for square in range(self.length):
+                    column_spacing = "   "
+                    if self.board[square][i]:
+                        row_string += self.board[square][i]
+                    else:
+                        row_string += self.empty_square
+                    row_string += column_spacing
+            else:
+                row_string = " ".join([self.empty_square if not self.board[square][i]
+                                       else self.board[square][i] for square in range(self.length)])
+            print(header + space + row_string + "\n")
 
     def clear(self) -> None:
         """ Clears the current board by replacing every square with the given empty square character """
