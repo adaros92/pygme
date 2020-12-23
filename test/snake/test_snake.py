@@ -1,3 +1,4 @@
+import pytest
 import random
 
 from pygme.snake import snake
@@ -5,8 +6,8 @@ from pygme.snake import snake
 
 def test_create_body():
     """ Tests snake.Body.__init__ method to ensure proper initial construction of the body object """
-    for _ in range(100):
-        random_length = random.randint(1, 100)
+    for _ in range(pytest.large_iteration_count):
+        random_length = random.randint(1, pytest.large_iteration_count)
         a_snake_body = snake.Body(x_coordinate=1, y_coordinate=2, length=random_length)
         assert a_snake_body.length == random_length
         count_of_nodes = 0
@@ -27,7 +28,7 @@ def test_body_coordinates():
 
 def test_change_direction():
     """ Tests snake.Body.change_direction method """
-    for _ in range(100):
+    for _ in range(pytest.large_iteration_count):
         # Choose a random starting direction
         directions = ["up", "down", "left", "right"]
         random_direction = directions[random.randint(0, 3)]
@@ -49,7 +50,7 @@ def test_grow_body():
     """ Tests snake.Body.grow method """
     # Check that the growth results in the right ending length
     a_snake_body = snake.Body(x_coordinate=1, y_coordinate=2)
-    for growth_amount in range(1, 100):
+    for growth_amount in range(1, pytest.large_iteration_count):
         prev_length = a_snake_body.length
         a_snake_body.grow(growth_amount)
         assert a_snake_body.length == prev_length + growth_amount
@@ -67,16 +68,16 @@ def test_grow_body():
 
 def test_body_slither():
     """ Tests snake.Body.slither method """
-    for _ in range(100):
+    for _ in range(pytest.large_iteration_count):
         directions = ["up", "down", "left", "right"]
         random_direction = directions[random.randint(0, 3)]
-        x_coordinate = random.randint(-100, 100)
-        y_coordinate = random.randint(-100, 100)
+        x_coordinate = random.randint(-pytest.large_iteration_count, pytest.large_iteration_count)
+        y_coordinate = random.randint(-pytest.large_iteration_count, pytest.large_iteration_count)
         # Create a random snake body
         a_snake_body = snake.Body(
             x_coordinate=x_coordinate, y_coordinate=y_coordinate, direction=random_direction)
         # Grow the body by a random amount
-        a_snake_body.grow(by=random.randint(1, 100))
+        a_snake_body.grow(by=random.randint(1, pytest.large_iteration_count))
         coordinates = []
         tmp_node = a_snake_body.head
         # Get previous coordinates by node

@@ -1,3 +1,4 @@
+import pytest
 import random
 
 from pygme.game import movement
@@ -5,7 +6,7 @@ from pygme.game import movement
 
 def test_resolve_movement():
     """ Tests game.movement.resolve_movement function """
-    for i in range(100):
+    for i in range(pytest.large_iteration_count):
         # Pick random starting coordinates and direction the movement is happening in
         x_coordinate = random.randint(-100, 100)
         y_coordinate = random.randint(-100, 100)

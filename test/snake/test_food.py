@@ -1,3 +1,4 @@
+import pytest
 import random
 
 from pygme.snake import food
@@ -5,9 +6,9 @@ from pygme.snake import food
 
 def test_cricket():
     """ Tests snake.food.Cricket class """
-    for i in range(100):
-        x_coordinate = random.randint(0, 100)
-        y_coordinate = random.randint(0, 100)
+    for i in range(pytest.large_iteration_count):
+        x_coordinate = random.randint(0, pytest.large_iteration_count)
+        y_coordinate = random.randint(0, pytest.large_iteration_count)
         cricket = food.Cricket(x_coordinate=x_coordinate, y_coordinate=y_coordinate)
         assert cricket.representation == "#"
         assert cricket.coordinates == (x_coordinate, y_coordinate)
@@ -17,9 +18,9 @@ def test_cricket():
 
 def test_mouse():
     """ Tests snake.food.Mouse class """
-    for i in range(100):
-        x_coordinate = random.randint(0, 100)
-        y_coordinate = random.randint(0, 100)
+    for i in range(pytest.large_iteration_count):
+        x_coordinate = random.randint(0, pytest.large_iteration_count)
+        y_coordinate = random.randint(0, pytest.large_iteration_count)
         mouse = food.Mouse(x_coordinate=x_coordinate, y_coordinate=y_coordinate)
         assert mouse.representation == "&"
         assert mouse.coordinates == (x_coordinate, y_coordinate)
@@ -29,9 +30,9 @@ def test_mouse():
 
 def test_food_collection_init():
     """ Tests snake.food.FoodCollection construction """
-    for i in range(25):
-        grid_width = random.randint(1, 100)
-        grid_length = random.randint(1, 100)
+    for i in range(pytest.large_iteration_count):
+        grid_width = random.randint(1, pytest.large_iteration_count)
+        grid_length = random.randint(1, pytest.large_iteration_count)
         collection = food.FoodCollection(grid_width=grid_width, grid_length=grid_length)
         collection_length = len(collection)
         assert collection_length == grid_width * grid_length and collection_length == collection.length

@@ -61,7 +61,7 @@ pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
 pydub==0.24.1
--e git+https://github.com/adaros92/pygme.git@5b24801184f9bf21cf238b7abbe2a9bf97ed0aa9#egg=pygme
+-e git+https://github.com/adaros92/pygme.git@dc3ec0aa7123af9310caa4e8d0cea61fc002debb#egg=pygme
 Pygments==2.7.2
 pyparsing==2.4.7
 PySocks==1.7.1
@@ -97,7 +97,6 @@ twine==3.2.0
 urllib3==1.26.2
 virtualenv==20.2.1
 wcwidth==0.2.5
--e git+https://github.com/adaros92/CS467-Project.git@b36d57b7f8417210311131f235f61a7f8c831b2c#egg=webapp
 webencodings==0.5.1
 Werkzeug==1.0.1
 wrapt==1.12.1

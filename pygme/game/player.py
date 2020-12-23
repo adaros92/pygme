@@ -6,8 +6,8 @@ from curtsies import Input
 
 class Player(object):
 
-    def __init__(self, player_id: uuid.UUID = uuid.uuid1(), computer=True):
-        self.player_id = str(player_id)
+    def __init__(self, computer=True):
+        self.player_id = uuid.uuid4()
         self.finished_game = False
         self.computer = computer
         self.keys = {"up": "'<UP>'", "right": "'<RIGHT>'", "left": "'<LEFT>'", "down": "'<DOWN>'"}
@@ -36,6 +36,11 @@ class Player(object):
                 break
 
     def monitor_key_presses(self, key: str = None, how: str = "thread") -> None:
+        """ Determines how to monitor for key presses by the player; whether in a separete thread or as a blocking call
+
+        :param key - a specific key to monitor for
+        :param how - how to monitor for keys pressed (thread or block)
+        """
         assert how in {"thread", "block"}
         if how == "block" and not key:
             raise ValueError("A keyboard key name must be provided to block until key is pressed")
@@ -45,4 +50,5 @@ class Player(object):
         # TODO blocking key press
 
     def wait_for_player_to_finish(self):
+        """ Waits for the player to finish doing an action if this is being performed in another thread """
         self.thread.join()

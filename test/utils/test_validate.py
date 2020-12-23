@@ -23,11 +23,11 @@ def test_validate_user_input():
 def test_validate_grid_index():
     """ Tests utils.validation.validate_grid_index """
     # Normal operation
-    for _ in range(100):
-        random_grid_length = random.randint(1, 50)
-        random_grid_width = random.randint(1, 50)
-        random_x_coordinate = random.randint(-100, 100)
-        random_y_coordinate = random.randint(-100, 100)
+    for _ in range(pytest.large_iteration_count):
+        random_grid_length = random.randint(1, pytest.large_iteration_count/2)
+        random_grid_width = random.randint(1, pytest.large_iteration_count/2)
+        random_x_coordinate = random.randint(-pytest.large_iteration_count, pytest.large_iteration_count)
+        random_y_coordinate = random.randint(-pytest.large_iteration_count, pytest.large_iteration_count)
         valid_grid_index = validation.validate_grid_index(
             random_grid_length, random_grid_width, random_x_coordinate, random_y_coordinate)
         if random_x_coordinate < 0 or random_y_coordinate < 0:

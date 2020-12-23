@@ -7,7 +7,7 @@ from pygme.game import board
 def test_create_board():
     """ Tests board.GameBoard._create_board method """
     # Construct random boards under normal operation
-    for _ in range(100):
+    for _ in range(pytest.large_iteration_count):
         rand_length = random.randint(1, 10)
         rand_width = random.randint(1, 10)
         test_board = board.GameBoard(rand_length + 1, rand_width + 1).board
@@ -24,7 +24,7 @@ def test_create_board():
 
 def test_clear():
     """ Tests board.GameBoard.clear method """
-    for _ in range(100):
+    for _ in range(pytest.large_iteration_count):
         # Construct random board
         rand_length = random.randint(1, 100)
         rand_width = random.randint(1, 10)
@@ -59,3 +59,30 @@ def test_refresh_board():
     test_board.refresh(board_2_coordinates, "*")
     assert expected_board_2 != test_board.board
 
+
+def test_is_square_clear():
+    """ Tests board.GameBoard.is_square_clear method """
+    for _ in range(pytest.large_iteration_count):
+        # Construct random board
+        rand_length = random.randint(1, 100)
+        rand_width = random.randint(1, 10)
+        test_board = board.GameBoard(rand_length + 1, rand_width + 1)
+        random_coordinates = (random.randint(0, rand_length - 1), random.randint(0, rand_width - 1))
+        assert test_board.is_square_clear(random_coordinates)
+        test_board.board[random_coordinates[0]][random_coordinates[1]] = "*"
+        assert not test_board.is_square_clear(random_coordinates)
+
+
+def test_print_board():
+    """ Tests board.GameBoard.print method """
+    for _ in range(pytest.large_iteration_count):
+        # Construct random board
+        rand_length = random.randint(1, 100)
+        rand_width = random.randint(1, 10)
+        test_board = board.GameBoard(rand_length + 1, rand_width + 1)
+        for i in range(100):
+            random_coordinates = (random.randint(0, rand_length - 1), random.randint(0, rand_width - 1))
+            test_board.refresh([random_coordinates], representation="*", clear_board=False)
+        # Print board out to ensure no exception pops up
+        test_board.print()
+        test_board.print(include_reference=True)

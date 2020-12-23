@@ -21,6 +21,11 @@ class GameBoard(object):
         self._create_board()
 
     def is_square_clear(self, coordinate: tuple) -> bool:
+        """ Returns True if the square at a given coordinate is empty; False if it's not empty
+
+        :param coordinate - an x,y coordinate to check
+        :returns whether the given coordinate is empty in the board
+        """
         assert are_coordinates_between_limits(coordinate, self.width, self.length)
         if self.board[coordinate[0]][coordinate[1]] == self.empty_square:
             return True
@@ -31,8 +36,11 @@ class GameBoard(object):
         for i in range(self.length):
             self.board.append([self.empty_square for _ in range(self.width)])
 
-    def print(self, include_reference=False) -> None:
-        """ Prints out the board to stdout """
+    def print(self, include_reference: bool =False) -> None:
+        """ Prints out the board to stdout
+
+        :param include_reference - whether to include grid references when printing the board out in the console
+        """
         # Clear the terminal
         clear_console()
         # Add an index before each column if applicable

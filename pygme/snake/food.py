@@ -24,7 +24,7 @@ class Food(ABC):
 
     def __init__(self,
                  food_type: str, representation: str, x_coordinate: int, y_coordinate: int,
-                 food_id: uuid.UUID = uuid.uuid1()) -> None:
+                 food_id: uuid.UUID = uuid.uuid4()) -> None:
         self.food_type = food_type
         self.representation = representation
         self.food_id = str(food_id)

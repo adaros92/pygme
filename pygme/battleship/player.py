@@ -5,7 +5,7 @@ from pygme.utils import space, validation
 
 class BattleshipPlayer(player.Player):
 
-    def __init__(self, computer=False):
+    def __init__(self, computer=True):
         super().__init__(computer=computer)
 
     def guess(self, game_board: board.BattleshipBoard) -> tuple:

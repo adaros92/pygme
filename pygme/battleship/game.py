@@ -5,7 +5,8 @@ from pygme.game.game import Game
 class BattleshipGame(Game):
 
     def __init__(self,
-                 config: dict, name: str = "Battleship", number_of_players: int = 2, difficulty: str = "normal"):
+                 config: dict, name: str = "Battleship", difficulty: str = "normal"):
+        number_of_players = 2
         super().__init__(name, config, number_of_players, difficulty)
         self.players = [player.BattleshipPlayer() for _ in range(number_of_players)]
         # Each player will have their own board and fleet of ships to play with
@@ -38,10 +39,12 @@ class BattleshipGame(Game):
         difficulty = initialization_object["difficulty"]
         self.boards = {player_id: self.construct_board(board_length, board_width)
                        for player_id, _ in self.boards.items()}
-        self.human_player.place_ships(
-            fleet=self.ship_fleets[self.human_player.player_id],
-            game_board=self.boards[self.human_player.player_id]
-        )
+        for player_obj in self.players:
+            player_id = player_obj.player_id
+            player_obj.place_ships(
+                fleet=self.ship_fleets[player_id],
+                game_board=self.boards[player_id]
+            )
 
     def _is_game_over(self) -> bool:
         """ Checks whether the game has finished and determines a winner
@@ -60,13 +63,16 @@ class BattleshipGame(Game):
         while not self._is_game_over():
             # Get the next player in line to play
             battleship_player = self._next_player()
+            other_players = self._other_players()
+            assert(len(other_players) == 1)
+            other_player = other_players[0]
             game_board = self.boards[battleship_player.player_id]
             game_board.print(include_reference=True)
             # Ask the player to guess coordinates to attack
             attack_coordinate = battleship_player.guess(game_board)
             # Attack the player's fleet on their board
-            player_board = self.boards[battleship_player.player_id]
-            player_fleet = self.ship_fleets[battleship_player.player_id]
+            player_board = self.boards[other_player.player_id]
+            player_fleet = self.ship_fleets[other_player.player_id]
             successful_hit, ship_destroyed, already_hit = player_board.attack(attack_coordinate, player_fleet)
         self.print_result()
         return {}

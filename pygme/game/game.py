@@ -20,7 +20,7 @@ class Game(ABC):
         self.config = config
         self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
 
-    def _assign_human_player(self):
+    def _assign_human_player(self) -> None:
         """ Makes a random player in the list of players the human player """
         # Get random index based on length of player list
         random_index = random.randint(0, len(self.players) - 1)
@@ -29,7 +29,12 @@ class Game(ABC):
         self.players[random_index].computer = False
         self.human_player = self.players[random_index]
 
-    def _get_user_input(self, initialization_object: dict = None):
+    def _get_user_input(self, initialization_object: dict = None) -> dict:
+        """ Retrieves user input to begin a game
+
+        :param initialization_object - some dictionary containing parameters to initialize with
+        :returns the given initialization object or a newly created one if it's not provided
+        """
         if not initialization_object:
             initialization_object = {}
             pre_prompt = ""
@@ -67,6 +72,21 @@ class Game(ABC):
         else:
             self.player_turn += 1
         return self.players[self.player_turn]
+
+    def _other_players(self) -> list:
+        """ Retrieves all the other players besides the one that has the current turn
+
+        :returns a list of player objects
+        """
+        player_count = len(self.players)
+        other_players = []
+        if player_count == 0:
+            raise RuntimeError("There are no active players in the {0} game".format(self.name))
+        for idx in range(player_count):
+            if idx == self.player_turn:
+                continue
+            other_players.append(self.players[idx])
+        return other_players
 
     def print_result(self) -> None:
         """ Prints the result of the game to the user """
