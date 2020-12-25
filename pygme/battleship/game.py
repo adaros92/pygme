@@ -12,6 +12,12 @@ class BattleshipGame(Game):
         # Each player will have their own board and fleet of ships to play with
         self.boards = {battleship_player.player_id: None for battleship_player in self.players}
         self.ship_fleets = {battleship_player.player_id: ships.ShipFleet(config) for battleship_player in self.players}
+        # These will change depending on the current turn
+        self.current_player = None
+        self.other_player = None
+        self.current_player_board = None
+        self.other_player_board = None
+        self.other_player_fleet = None
 
     @staticmethod
     def construct_board(length: int, width: int, game_board: board.BattleshipBoard = None) -> board.BattleshipBoard:
@@ -57,22 +63,50 @@ class BattleshipGame(Game):
                 return True
         return False
 
+    def _display_boards(self) -> None:
+        # Start out with the other player's board displayed
+        # Hide the locations of the enemy ships whenever the enemy's board is printed out
+        ship_representations_to_hide = self.other_player_fleet.unique_ship_representations
+        enemy_board_displayed = True
+        self.other_player_board.print(include_reference=True, ignore_characters=ship_representations_to_hide)
+        print("\nYou're looking at the other player's board.\n")
+        # Provide the option to switch between boards or attack
+        while True:
+            player_input = input("Press b to toggle between boards or attack when you're ready to make a move:")
+            # Print current player's board
+            if player_input == "b" and enemy_board_displayed:
+                print("Your board:")
+                self.current_player_board.print(include_reference=True)
+                enemy_board_displayed = False
+                print("\nYou're looking at your board.\n")
+            # Print other player's board
+            elif player_input == "b":
+                self.other_player_board.print(include_reference=True, ignore_characters=ship_representations_to_hide)
+                enemy_board_displayed = True
+                print("\nYou're looking at the other player's board.\n")
+            elif player_input == "attack":
+                break
+
     def run(self, initialization_object: dict = None) -> dict:
         self._initialize(initialization_object)
         # Keep running the game as long as no one has lost
         while not self._is_game_over():
-            # Get the next player in line to play
-            battleship_player = self._next_player()
+            # Get the players involved and resolve the current turn
+            self.current_player = self._next_player()
             other_players = self._other_players()
-            assert(len(other_players) == 1)
-            other_player = other_players[0]
-            game_board = self.boards[battleship_player.player_id]
-            game_board.print(include_reference=True)
-            # Ask the player to guess coordinates to attack
-            attack_coordinate = battleship_player.guess(game_board)
-            # Attack the player's fleet on their board
-            player_board = self.boards[other_player.player_id]
-            player_fleet = self.ship_fleets[other_player.player_id]
-            successful_hit, ship_destroyed, already_hit = player_board.attack(attack_coordinate, player_fleet)
+            assert (len(other_players) == 1)
+            self.other_player = other_players[0]
+            self.current_player_board = self.boards[self.current_player.player_id]
+            # Get other player's information
+            self.other_player_board = self.boards[self.other_player.player_id]
+            self.other_player_fleet = self.ship_fleets[self.other_player.player_id]
+            # TODO already hit logic
+            # Display the boards to the current player if they're human
+            if not self.current_player.computer:
+                self._display_boards()
+            # Attack fleet
+            attack_coordinate = self.current_player.guess(self.current_player_board)
+            successful_hit, ship_destroyed, already_hit = self.other_player_board.attack(
+                attack_coordinate, self.other_player_fleet)
         self.print_result()
         return {}

@@ -63,24 +63,11 @@ class BattleshipPlayer(player.Player):
         # Keep trying to place the ship until it doesn't overlap with anything that's currently on the board
         while not ship_placement_ok:
             try:
-                # The human player will provide the coordinates for each ship
-                if not self.computer:
-                    # Receive input from human user on where and how to place the ship
-                    print("Place the {0} ship of size {1}".format(ship.ship_type, ship.size))
-                    direction = input("Enter either right or down for the direction the ship will face: ")
-                    validation.validate_out_of_possible_options(direction, ship_directions)
-                    starting_coordinate = input(
-                        "Enter coordinate of left-most or top-most square to place ship in (x,y):")
-                    starting_coordinate_list = starting_coordinate.replace(
-                        "(", "").replace(")", "").replace(" ", "").split(",")
-                    starting_coordinate = tuple([int(x) for x in starting_coordinate_list])
-                    self._validate_ship_placement([starting_coordinate], game_board)
-                # The computer will just pick at random until the placement is successful
-                else:
-                    board_width, board_length = game_board.width, game_board.length
-                    starting_coordinate = space.get_coordinates_between_limits(board_width, board_length)
-                    direction = space.get_random_directions(list(ship_directions), 1)[0]
-                # Retrieve the coordinates based on input or random starting location of ships
+                # Choose a random location and starting direction
+                board_width, board_length = game_board.width, game_board.length
+                starting_coordinate = space.get_coordinates_between_limits(board_width, board_length)
+                direction = space.get_random_directions(list(ship_directions), 1)[0]
+                # Retrieve the coordinates based random starting location of ships
                 coordinates = space.get_contiguous_coordinates(starting_coordinate, direction, ship.size)
                 # Raise exception if any of the ships go beyond the board or if they overlap others
                 self._validate_ship_placement(coordinates, game_board)
@@ -90,9 +77,6 @@ class BattleshipPlayer(player.Player):
                 # Update the board with the new ship
                 game_board.place_ship(ship)
             except ValueError as e:
-                # Let human player know what went wrong with their placement and retry
-                if not self.computer:
-                    print(e)
                 continue
 
     def place_ships(self, fleet: ships.ShipFleet, game_board: board.BattleshipBoard) -> None:

@@ -36,13 +36,16 @@ class GameBoard(object):
         for i in range(self.length):
             self.board.append([self.empty_square for _ in range(self.width)])
 
-    def print(self, include_reference: bool =False) -> None:
+    def print(self, include_reference: bool = False, ignore_characters: set = None) -> None:
         """ Prints out the board to stdout
 
         :param include_reference - whether to include grid references when printing the board out in the console
+        :param ignore_characters - a collection of characters to replace with empty characters
         """
         # Clear the terminal
         clear_console()
+        if not ignore_characters:
+            ignore_characters = set()
         # Add an index before each column if applicable
         if include_reference:
             header_items = [str(x) for x in range(self.length)]
@@ -67,13 +70,14 @@ class GameBoard(object):
                 row_string = ""
                 for square in range(self.length):
                     column_spacing = "   "
-                    if self.board[square][i]:
+                    if self.board[square][i] and self.board[square][i] not in ignore_characters:
                         row_string += self.board[square][i]
                     else:
                         row_string += self.empty_square
                     row_string += column_spacing
             else:
-                row_string = " ".join([self.empty_square if not self.board[square][i]
+                row_string = " ".join([self.empty_square if (not self.board[square][i]
+                                                             or self.board[square][i] in ignore_characters)
                                        else self.board[square][i] for square in range(self.length)])
             print(header + space + row_string + "\n")
 

@@ -146,6 +146,13 @@ class ShipFleet(dict):
             return_str += "{0}, ".format(print_function(ship))
         return return_str[:-2]
 
+    @property
+    def unique_ship_representations(self) -> set:
+        ship_representations = set()
+        for _, ship in self.items():
+            ship_representations.add(ship.representation)
+        return ship_representations
+
     def __repr__(self) -> str:
         return self._print(repr)
 

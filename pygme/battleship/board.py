@@ -37,6 +37,7 @@ class BattleshipBoard(board.GameBoard):
             # Attack the fleet
             successful_hit, ship_destroyed, representation = fleet.accept_attack(coordinate)
             # If the attack was successful, then refresh the board with the new damaged representation of the ship
+            self.refresh([coordinate], representation="@", clear_board=False)
             if successful_hit:
                 self.refresh([coordinate], representation, clear_board=False)
         # Emit whether the attack was successful and if a ship was destroyed
