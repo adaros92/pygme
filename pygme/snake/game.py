@@ -10,7 +10,7 @@ class SnakeGame(Game):
     """ Defines the main Snake game loop and initialization functionality """
 
     def __init__(self,
-                 config: dict, name: str = "Snake", number_of_players: int = 1, difficulty: str = "normal") -> None:
+                 config: dict, name: str = "Snake", difficulty: str = "normal") -> None:
         super().__init__(name, config, number_of_players, difficulty)
         self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
         self.board = None
@@ -25,25 +25,18 @@ class SnakeGame(Game):
 
         :param initialization_object - a dictionary containing game parameter names and their values for operation
         """
-        # Validate completeness of inputs
-        for required_input in self.required_inputs:
-            if required_input not in initialization_object:
-                raise RuntimeError("{0} is a required input to begin a Snake game".format(required_input))
+        self._validate_base(initialization_object)
         # Validate correct board dimensions
         board_width = initialization_object["board_width"]
         board_length = initialization_object["board_length"]
-        difficulty = initialization_object["difficulty"]
         # Required min coordinates for a game of snake
-        # TODO should be in config
-        required_width = 10
-        required_length = 10
+        required_width = self.config.get("minimum_board_width", 10)
+        required_length = self.config.get("minimum_board_length", 10)
         if initialization_object["board_width"] < required_width \
                 or initialization_object["board_length"] < required_length:
             raise ValueError("The Snake board must be at least {0}x{1}".format(required_length, required_width))
         if board_width != board_length:
             raise ValueError("The Snake board must be a square where width == length")
-        if difficulty not in self.DIFFICULTY_TYPES:
-            raise ValueError("The game difficulty must be one of {0}".format(self.DIFFICULTY_TYPES))
 
     def _initialize(self, initialization_object: dict = None) -> None:
         """ Initializes a game of Snake from the given object of game parameters or user input if one is not provided

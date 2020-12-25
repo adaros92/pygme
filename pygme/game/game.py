@@ -10,15 +10,15 @@ class Game(ABC):
 
     DIFFICULTY_TYPES = {"easy", "normal", "hard"}
 
-    def __init__(self, name: str, config: dict, number_of_players: int = 1, difficulty: str = "normal") -> None:
+    def __init__(self, name: str, config: dict, difficulty: str = "normal") -> None:
         self.name = name
-        self.number_of_players = number_of_players
+        self.number_of_players = config["number_of_players"]
         self.difficulty = difficulty
         self.players = []
         self.human_player = None
         self.player_turn = 0
         self.config = config
-        self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
+        self.required_inputs = {key: eval(key_type) for key, key_type in config["required_inputs"].items()}
 
     def _assign_human_player(self) -> None:
         """ Makes a random player in the list of players the human player """
@@ -101,9 +101,27 @@ class Game(ABC):
 
     @staticmethod
     def construct_board(length: int, width: int, board: GameBoard = None) -> GameBoard:
+        """ Creates a new board of the given length and width if an existing board is not provided
+
+        :param length - the length of a new board to create
+        :param width - the width of a new board to create
+        :param board - an existing board to use
+        """
         if not board:
             board = GameBoard(length, width)
         return board
+
+    def _validate_base(self, initialization_object: dict) -> None:
+        """ Validates the base config parameters required for any game
+
+        :param initialization_object - a dictionary of game parameters to validate
+        """
+        # Validate completeness of inputs
+        for required_input in self.required_inputs:
+            if required_input not in initialization_object:
+                raise ValueError("{0} is a required input to begin a {1} game".format(required_input, self.name))
+        if initialization_object["difficulty"] not in self.DIFFICULTY_TYPES:
+            raise ValueError("The game difficulty must be one of {0}".format(self.DIFFICULTY_TYPES))
 
     @abstractmethod
     def _validate_initialization(self, initialization_object: dict) -> None:

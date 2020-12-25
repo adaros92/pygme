@@ -1,6 +1,6 @@
 from pygme.battleship import ships, board
 from pygme.game import player
-from pygme.utils import space, validation
+from pygme.utils import space
 
 
 class BattleshipPlayer(player.Player):

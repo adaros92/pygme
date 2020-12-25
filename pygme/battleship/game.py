@@ -6,9 +6,8 @@ class BattleshipGame(Game):
 
     def __init__(self,
                  config: dict, name: str = "Battleship", difficulty: str = "normal"):
-        number_of_players = 2
-        super().__init__(name, config, number_of_players, difficulty)
-        self.players = [player.BattleshipPlayer() for _ in range(number_of_players)]
+        super().__init__(name, config, difficulty)
+        self.players = [player.BattleshipPlayer() for _ in range(self.number_of_players)]
         # Each player will have their own board and fleet of ships to play with
         self.boards = {battleship_player.player_id: None for battleship_player in self.players}
         self.ship_fleets = {battleship_player.player_id: ships.ShipFleet(config) for battleship_player in self.players}
@@ -33,7 +32,7 @@ class BattleshipGame(Game):
         return game_board
 
     def _validate_initialization(self, initialization_object: dict) -> None:
-        pass
+        self._validate_base(initialization_object)
 
     def _initialize(self, initialization_object: dict = None) -> None:
         # Assign a random player to be the human player
@@ -72,7 +71,7 @@ class BattleshipGame(Game):
         print("\nYou're looking at the other player's board.\n")
         # Provide the option to switch between boards or attack
         while True:
-            player_input = input("Press b to toggle between boards or attack when you're ready to make a move:")
+            player_input = input("Press b to toggle between boards or a when you're ready to make a move:")
             # Print current player's board
             if player_input == "b" and enemy_board_displayed:
                 print("Your board:")
@@ -84,7 +83,7 @@ class BattleshipGame(Game):
                 self.other_player_board.print(include_reference=True, ignore_characters=ship_representations_to_hide)
                 enemy_board_displayed = True
                 print("\nYou're looking at the other player's board.\n")
-            elif player_input == "attack":
+            elif player_input == "a":
                 break
 
     def run(self, initialization_object: dict = None) -> dict:

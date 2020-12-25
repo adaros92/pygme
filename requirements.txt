@@ -61,7 +61,7 @@ pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
 pydub==0.24.1
--e git+https://github.com/adaros92/pygme.git@f72f82904b60ee7d0ffed1d482d8c1dfe142453c#egg=pygme
+-e git+https://github.com/adaros92/pygme.git@d0e91b328c542b671b4fba1ff4b0d539e7cd8002#egg=pygme
 Pygments==2.7.2
 pyparsing==2.4.7
 PySocks==1.7.1

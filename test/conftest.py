@@ -12,6 +12,8 @@ def pytest_configure():
     pytest.size_by_type = {"carrier": 5, "battleship": 4, "destroyer": 3, "submarine": 3, "patrol": 2}
     pytest.battleship_test_config = {
         "ship_types": ["carrier", "battleship", "destroyer", "submarine", "patrol"],
-        "size_by_type": {"carrier": 5, "battleship": 4, "destroyer": 3, "submarine": 3, "patrol": 2}
+        "size_by_type": {"carrier": 5, "battleship": 4, "destroyer": 3, "submarine": 3, "patrol": 2},
+        "required_inputs": {"board_width": "int", "board_length": "int", "difficulty": "str"},
+        "number_of_players": 2
     }
 
