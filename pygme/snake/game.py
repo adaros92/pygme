@@ -11,8 +11,7 @@ class SnakeGame(Game):
 
     def __init__(self,
                  config: dict, name: str = "Snake", difficulty: str = "normal") -> None:
-        super().__init__(name, config, number_of_players, difficulty)
-        self.required_inputs = {"board_width": int, "board_length": int, "difficulty": str}
+        super().__init__(name, config, difficulty)
         self.board = None
         self.snake = None
         self.food_collection = None
@@ -65,7 +64,6 @@ class SnakeGame(Game):
         :returns True if the game is over, False otherwise
         """
         game_over = False
-        end_game_coordinates = set()
         current_snake_location = self.snake.current_location
         for coordinate in current_snake_location:
             # check if any coordinate is outside of the board
@@ -76,12 +74,6 @@ class SnakeGame(Game):
             elif coordinate[1] < 0 or coordinate[1] > self.board.width - 1:
                 game_over = True
                 break
-            '''
-            elif coordinate in end_game_coordinates:
-                game_over = True
-                break
-            end_game_coordinates.add(coordinate)
-            '''
         return game_over
 
     def _get_food(self) -> None:
