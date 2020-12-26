@@ -5,6 +5,16 @@ from pygme.game import player
 from pygme.battleship import game
 
 
+@pytest.fixture
+def mock_user_input(monkeypatch):
+    """ mocks game.BattleshipGame _get_user_input method """
+
+    def mock_get_user_input(*args, **kwargs):
+        return {"board_width": 20, "board_length": 20, "difficulty": "normal"}
+
+    monkeypatch.setattr(game.BattleshipGame, "_get_user_input", mock_get_user_input)
+
+
 def test_assign_human_player():
     """ Tests _assign_human_player method in base Game class """
     for _ in range(pytest.large_iteration_count):
@@ -53,3 +63,17 @@ def test_print_result():
         test_game.players[0].winner = True
         # Ensure printing results doesn't raise exception under different random scenarios
         test_game.print_result()
+
+
+def test_initialize(mock_user_input):
+    for _ in range(pytest.large_iteration_count):
+        # Start a test game and assign and create a random number of players
+        test_game = game.BattleshipGame(config=pytest.battleship_test_config)
+        test_game._initialize()
+        # Ensure boards/fleets created successfully and difficulty correctly captures after game initialization
+        assert (test_game.difficulty == "normal" and len(test_game.boards) == len(test_game.players) and
+                len(test_game.ship_fleets) == len(test_game.players))
+        for player_id, board in test_game.boards.items():
+            assert board.width == 20 and board.length == 20
+        for player_id, fleet in test_game.ship_fleets.items():
+            assert len(fleet) > 0

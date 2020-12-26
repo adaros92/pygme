@@ -148,6 +148,10 @@ class ShipFleet(dict):
 
     @property
     def unique_ship_representations(self) -> set:
+        """ Provides a collection of unique ship representation characters when displayed in the terminal
+
+        :returns a set of representation characters
+        """
         ship_representations = set()
         for _, ship in self.items():
             ship_representations.add(ship.representation)
