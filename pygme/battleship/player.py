@@ -8,6 +8,42 @@ class BattleshipPlayer(player.Player):
     def __init__(self, computer=True):
         super().__init__(computer=computer)
 
+    def _get_coordinate_from_input(self) -> tuple:
+        """ Accepts user attack coordinate input
+
+        :returns a tuple containing the X and Y coordinates received as user input
+        """
+        x_coordinate_guess = int(input("Enter the x-coordinate of the square to attack:"))
+        y_coordinate_guess = int(input("Enter the y-coordinate of the square to attach:"))
+        return x_coordinate_guess, y_coordinate_guess
+
+    def _human_guess(self, game_board: board.BattleshipBoard) -> tuple:
+        """ Accept an attack guess from a human player as raw input
+
+        :param game_board - the board where ships to attack are currently located
+        :returns a tuple containing the X and Y coordinates of the square to attack
+        """
+        input_valid = False
+        coordinate = None
+        while not input_valid:
+            try:
+                coordinate = self._get_coordinate_from_input()
+            except ValueError:
+                print("Individual coordinate components must be single integers")
+                continue
+            if space.are_coordinates_between_limits(coordinate, game_board.width, game_board.length):
+                input_valid = True
+        return coordinate
+
+    def _computer_guess(self, game_board: board.BattleshipBoard) -> tuple:
+        """ Run computer attack guessing algorithm
+
+        :param game_board - the board where ships to attack are currently located
+        :returns a tuple containing the X and Y coordinates of the square to attack
+        """
+        # TODO Implement a smart guessing algorithm
+        return space.get_coordinates_between_limits(game_board.width, game_board.length)
+
     def guess(self, game_board: board.BattleshipBoard) -> tuple:
         """ Each player will guess the other's ships' locations and attack them one at a time
 
@@ -15,23 +51,11 @@ class BattleshipPlayer(player.Player):
         :returns a tuple containing the X and Y coordinates of the square to attack
         """
         # Accept input from player if they're not the computer
-        input_valid = False
-        coordinate = None
         if not self.computer:
-            while not input_valid:
-                try:
-                    x_coordinate_guess = int(input("Enter the x-coordinate of the square to attack:"))
-                    y_coordinate_guess = int(input("Enter the y-coordinate of the square to attach:"))
-                    coordinate = (x_coordinate_guess, y_coordinate_guess)
-                except ValueError:
-                    print("Individual coordinate components must be single integers")
-                    continue
-                if space.are_coordinates_between_limits(coordinate, game_board.width, game_board.length):
-                    input_valid = True
+            coordinate = self._human_guess(game_board)
         # Follow guessing algorithm if computer
         else:
-            # TODO Implement a smart guessing algorithm
-            coordinate = space.get_coordinates_between_limits(game_board.width, game_board.length)
+            coordinate = self._computer_guess(game_board)
         return coordinate
 
     @staticmethod

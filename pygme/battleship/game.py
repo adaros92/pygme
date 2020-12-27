@@ -17,6 +17,10 @@ class BattleshipGame(Game):
         self.current_player_board = None
         self.other_player_board = None
         self.other_player_fleet = None
+        # These maintain current ship hit stats
+        self.hits_by_player = {battleship_player.player_id: 0 for battleship_player in self.players}
+        self.ships_destroyed_by_player = {
+            battleship_player.player_id: 0 for battleship_player in self.players}
 
     @staticmethod
     def construct_board(length: int, width: int, game_board: board.BattleshipBoard = None) -> board.BattleshipBoard:
@@ -32,9 +36,20 @@ class BattleshipGame(Game):
         return game_board
 
     def _validate_initialization(self, initialization_object: dict) -> None:
+        """ Validates the Battleship game initialization
+
+        :param initialization_object - a dictionary containing starting parameters to run the game with
+        """
         self._validate_base(initialization_object)
+        # A default game of Battleship includes an 8x8 board
+        assert initialization_object["board_width"] >= 8 and initialization_object["board_length"] >= 8
 
     def _initialize(self, initialization_object: dict = None) -> None:
+        """ Initializes the game of battleship by choosing a human player, receiving input about the size of the
+         board, creating each player's board, and placing each player's ships
+
+        :param initialization_object - a dictionary containing starting parameters to run the game with
+        """
         # Assign a random player to be the human player
         self._assign_human_player()
         # Get input from the user if no initialization_object is provided
@@ -62,7 +77,13 @@ class BattleshipGame(Game):
                 return True
         return False
 
+    @staticmethod
+    def _get_toggle_input() -> str:
+        return input("Press b to toggle between boards or a when you're ready to make a move:")
+
     def _display_boards(self) -> None:
+        """ Displays the two players' boards by providing a toggle option to switch between the current or enemy
+        player's board"""
         # Start out with the other player's board displayed
         # Hide the locations of the enemy ships whenever the enemy's board is printed out
         ship_representations_to_hide = self.other_player_fleet.unique_ship_representations
@@ -71,7 +92,8 @@ class BattleshipGame(Game):
         print("\nYou're looking at the other player's board.\n")
         # Provide the option to switch between boards or attack
         while True:
-            player_input = input("Press b to toggle between boards or a when you're ready to make a move:")
+            self._display_player_status()
+            player_input = self._get_toggle_input()
             # Print current player's board
             if player_input == "b" and enemy_board_displayed:
                 print("Your board:")
@@ -86,20 +108,45 @@ class BattleshipGame(Game):
             elif player_input == "a":
                 break
 
+    def _display_player_status(self) -> None:
+        """ Prints out a status consisting of number of hits and ships destroyed """
+        successful_hits = self.hits_by_player[self.current_player.player_id]
+        ships_destroyed = self.ships_destroyed_by_player[self.current_player.player_id]
+        print("Hits: {0}".format(successful_hits))
+        print("Ships destroyed: {0}\n".format(ships_destroyed))
+
+    def _tally_hit(self, successful_hit: bool, ship_destroyed: bool) -> None:
+        """ Increments ship hit status by player based on given arguments
+
+        :param successful_hit - whether a hit was successful or not
+        :param ship_destroyed - whether a hit destroyed a ship or not
+        """
+        if successful_hit:
+            self.hits_by_player[self.current_player.player_id] += 1
+        if ship_destroyed:
+            self.ships_destroyed_by_player[self.current_player.player_id] += 1
+
     def run(self, initialization_object: dict = None) -> dict:
+        """ The Battleship game loop that performs all of the resource management and user input handling to run
+        the game
+
+        :param initialization_object - a dictionary containing starting parameters to run the game with
+        """
         self._initialize(initialization_object)
+        already_hit = False
         # Keep running the game as long as no one has lost
         while not self._is_game_over():
-            # Get the players involved and resolve the current turn
-            self.current_player = self._next_player()
-            other_players = self._other_players()
-            assert (len(other_players) == 1)
-            self.other_player = other_players[0]
-            self.current_player_board = self.boards[self.current_player.player_id]
-            # Get other player's information
-            self.other_player_board = self.boards[self.other_player.player_id]
-            self.other_player_fleet = self.ship_fleets[self.other_player.player_id]
-            # TODO already hit logic
+            # Continue a turn if the previous hit was not for a coordinate that has not been hit before
+            if not already_hit:
+                # Get the players involved and resolve the current turn
+                self.current_player = self._next_player()
+                other_players = self._other_players()
+                assert (len(other_players) == 1)
+                self.other_player = other_players[0]
+                self.current_player_board = self.boards[self.current_player.player_id]
+                # Get other player's information
+                self.other_player_board = self.boards[self.other_player.player_id]
+                self.other_player_fleet = self.ship_fleets[self.other_player.player_id]
             # Display the boards to the current player if they're human
             if not self.current_player.computer:
                 self._display_boards()
@@ -107,5 +154,7 @@ class BattleshipGame(Game):
             attack_coordinate = self.current_player.guess(self.current_player_board)
             successful_hit, ship_destroyed, already_hit = self.other_player_board.attack(
                 attack_coordinate, self.other_player_fleet)
+            # Keep track of successful hits and ships destroyed
+            self._tally_hit(successful_hit, ship_destroyed)
         self.print_result()
         return {}

@@ -58,10 +58,6 @@ def test_ship_is_hit():
     fleet = ships.ShipFleet(config=pytest.battleship_test_config)
     for ship_name, ship in fleet.items():
         _place_ship(ship)
-        # When first placed, ships will not have any destroyed coordinates
-        for coordinate in ship.coordinates:
-            assert not fleet.ship_is_hit(coordinate)
-        # When damaged though, there will be hit coordinates
         for coordinate in ship.coordinates:
             ship.take_damage(coordinate)
             assert fleet.ship_is_hit(coordinate)

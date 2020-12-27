@@ -6,13 +6,16 @@ from pygme.battleship import game
 
 
 @pytest.fixture
-def mock_user_input(monkeypatch):
-    """ mocks game.BattleshipGame _get_user_input method """
-
-    def mock_get_user_input(*args, **kwargs):
+def mock_game_input(monkeypatch) -> None:
+    def mock_get_user_input(*args, **kwargs) -> dict:
+        """ mocks game.BattleshipGame _get_user_input method """
         return {"board_width": 20, "board_length": 20, "difficulty": "normal"}
 
+    def mock_board_toggle_input(*args, **kwargs) -> str:
+        return "b"
+
     monkeypatch.setattr(game.BattleshipGame, "_get_user_input", mock_get_user_input)
+    monkeypatch.setattr(game.BattleshipGame, "_get_toggle_input", mock_board_toggle_input)
 
 
 def test_assign_human_player():
@@ -65,7 +68,8 @@ def test_print_result():
         test_game.print_result()
 
 
-def test_initialize(mock_user_input):
+def test_initialize(mock_game_input):
+    """ Tests _initialize method in BattleShip game class """
     for _ in range(pytest.large_iteration_count):
         # Start a test game and assign and create a random number of players
         test_game = game.BattleshipGame(config=pytest.battleship_test_config)
