@@ -6,7 +6,7 @@ import pkg_resources
 from pygme.snake.game import SnakeGame
 from pygme.battleship.game import BattleshipGame
 
-SUPPORTED_GAMES = {"snake": SnakeGame, "adventure": None, "tetris": None, "battleship": BattleshipGame}
+SUPPORTED_GAMES = {"snake": SnakeGame, "battleship": BattleshipGame}
 
 
 def _load_config() -> dict:
@@ -55,7 +55,10 @@ def main():
     game_class = SUPPORTED_GAMES[args.game]
     if not game_class:
         raise RuntimeError("Game is unavailable. Check back later!")
-    game_object = game_class(config=config[args.game])
+    game_config = config[args.game]
+    # Assume a default dictionary if none provided for word games
+    game_config["dictionary_filename"] = game_config.get("dictionary_filename", "dictionary.txt")
+    game_object = game_class(config=game_config)
     game_object.run()
 
 

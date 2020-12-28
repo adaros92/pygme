@@ -16,4 +16,5 @@ def pytest_configure():
         "required_inputs": {"board_width": "int", "board_length": "int", "difficulty": "str"},
         "number_of_players": 2
     }
+    pytest.default_dictionary_config = {"dictionary_filename": "dictionary.txt"}
 

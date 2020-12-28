@@ -16,7 +16,7 @@ setup(
     url="https://github.com/adaros92/pygme",
     version='0.1.0',
     install_requires=['curtsies'],
-    tests_require=['pytest', 'pytest-cov', 'tox'],
+    tests_require=['pytest', 'pytest-cov', 'tox', 'Random-Word'],
     license="MIT",
     classifiers=[
             "License :: OSI Approved :: MIT License",

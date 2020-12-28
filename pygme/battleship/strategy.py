@@ -1,44 +1,9 @@
-from abc import ABC, abstractmethod
-
+from pygme.game import strategy
 from pygme.battleship import board
 from pygme.utils import space
 
 
-class BattleshipStrategy(ABC):
-    """ Provides an interface for Battleship strategies
-
-    Constructor parameters:
-
-    @param game_board - a Battleship board on which the game is being played
-    @param name - the name of the strategy
-    """
-    def __init__(self, game_board: board.BattleshipBoard, name: str) -> None:
-        self.game_board = game_board
-        self.name = name
-        self.previous_coordinate_attacked = None
-        self.previous_attack_hit = False
-        self.previous_attack_sank_ship = False
-        self.already_guessed = set()
-
-    def _process_information(self, information: dict) -> None:
-        """ Retrieves the required pieces information needed to make a guess
-
-        @param information - information about the previous round to base the guessing decision on
-        """
-        self.previous_coordinate_attacked = information["coordinate"]
-        self.previous_attack_hit = information["successful_hit"]
-        self.previous_attack_sank_ship = information["ship_destroyed"]
-
-    def _random_guess(self):
-        return space.get_coordinates_between_limits(
-            self.game_board.width, self.game_board.length, exclusion_set=self.already_guessed)
-
-    @abstractmethod
-    def guess(self, information: dict) -> tuple:
-        pass
-
-
-class RandomGuessStrategy(BattleshipStrategy):
+class RandomGuessStrategy(strategy.Strategy):
 
     def __init__(self, game_board: board.BattleshipBoard, name: str = "Random Guess"):
         super().__init__(game_board, name)
@@ -55,7 +20,7 @@ class RandomGuessStrategy(BattleshipStrategy):
         return guess
 
 
-class HuntTargetStrategy(BattleshipStrategy):
+class HuntTargetStrategy(strategy.Strategy):
     """ Hunt/Target guessing strategy
 
     - If the last hit was successful and a ship has yet to be destroyed, add adjacent squares to stack
@@ -113,7 +78,7 @@ class HuntTargetStrategy(BattleshipStrategy):
         return guess
 
 
-class ProbabilityDensityStrategy(BattleshipStrategy):
+class ProbabilityDensityStrategy(strategy.Strategy):
 
     def __init__(self, game_board: board.BattleshipBoard, name: str = "Random Guess"):
         super().__init__(game_board, name)
