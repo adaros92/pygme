@@ -9,7 +9,7 @@ from pygme.battleship import game, board
 def mock_game_input(monkeypatch) -> None:
     def mock_get_user_input(*args, **kwargs) -> dict:
         """ mocks game.BattleshipGame _get_user_input method """
-        return {"board_width": 20, "board_length": 20, "difficulty": "normal"}
+        return {"board_width": 20, "board_length": 20, "difficulty": "normal", "human_player_involved": False}
 
     def mock_board_toggle_input(*args, **kwargs) -> str:
         return "b"
@@ -87,3 +87,26 @@ def test_initialize(mock_game_input):
             assert game_board.width == 20 and game_board.length == 20
         for player_id, fleet in test_game.ship_fleets.items():
             assert len(fleet) > 0
+
+
+def test_run(mock_game_input):
+    """ Tests run method in BattleShip game class """
+    for _ in range(pytest.small_iteration_count):
+        test_game = game.BattleshipGame(config=pytest.battleship_test_config)
+        # Run the game with 2 computers
+        test_game.run()
+        max_ships_destroyed = 0
+        min_ships_destroyed = 10000
+        for player_id, ships_destroyed in test_game.ships_destroyed_by_player.items():
+            max_ships_destroyed = max(max_ships_destroyed, ships_destroyed)
+            min_ships_destroyed = min(min_ships_destroyed, ships_destroyed)
+        # Ensure that all ships have been destroyed for only one player which is the game over condition
+        assert max_ships_destroyed == len(test_game.other_player_fleet) and min_ships_destroyed < max_ships_destroyed
+        winner_count = 0
+        loser_count = 0
+        for battleship_player in test_game.players:
+            if battleship_player.winner:
+                winner_count += 1
+            else:
+                loser_count += 1
+        assert winner_count == 1 and loser_count == test_game.number_of_players - winner_count

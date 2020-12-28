@@ -49,3 +49,15 @@ def test_guess(mock_player_input):
                 "already_hit": False
             })
             assert space.are_coordinates_between_limits(guess, game_board.width, game_board.length)
+
+
+def test_player_equality():
+    """ Tests eq and ne methods """
+    players, _, game_board = _initialize_resources()
+    # Comparison is done based on ID
+    first_player = players[0]
+    second_player = players[1]
+    assert first_player != second_player
+    first_player.player_id = 1
+    second_player.player_id = 1
+    assert first_player == second_player

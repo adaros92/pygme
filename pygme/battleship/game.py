@@ -54,6 +54,7 @@ class BattleshipGame(Game):
         initialization_object = self._get_user_input(initialization_object)
         board_width = initialization_object["board_width"]
         board_length = initialization_object["board_length"]
+        human_player_involved = initialization_object.get("human_player_involved", True)
         self.difficulty = initialization_object["difficulty"]
         # Create boards and fleets
         board_list = [self.construct_board(board_length, board_width) for _ in range(self.number_of_players)]
@@ -75,23 +76,49 @@ class BattleshipGame(Game):
                 "ship_destroyed": False,
                 "already_hit": False
             }
-        # Assign a random player to be the human player
-        self._assign_human_player()
+        # Assign a random player to be the human player unless specified otherwise in initialization input
+        if human_player_involved:
+            self._assign_human_player()
 
     def _is_game_over(self) -> bool:
         """ Checks whether the game has finished and determines a winner
 
         :returns True if the game has finished, False otherwise
         """
+        players_encountered = set()
+        game_over = False
+        losing_player = None
         for player_in_game in self.players:
+            players_encountered.add(player_in_game)
             if self.ship_fleets[player_in_game.player_id].is_destroyed():
+                # Set the player with the destroyed fleet as the loser
                 player_in_game.winner = False
-                return True
-        return False
+                losing_player = player_in_game
+                game_over = True
+        # Set other players as the winners if the game has ended
+        if game_over:
+            for encountered_player in players_encountered:
+                if encountered_player != losing_player:
+                    encountered_player.winner = True
+        return game_over
 
     @staticmethod
     def _get_toggle_input() -> str:
         return input("Press b to toggle between boards or a when you're ready to make a move:")
+
+    def _display_player_status(self, enemy_board_displayed: bool) -> None:
+        """ Prints out a status consisting of number of hits and ships destroyed
+
+        :param enemy_board_displayed - whether the enemy's board is currently displayed or not
+        """
+        if enemy_board_displayed:
+            player_id = self.current_player.player_id
+        else:
+            player_id = self.other_player.player_id
+        successful_hits = self.hits_by_player[player_id]
+        ships_destroyed = self.ships_destroyed_by_player[player_id]
+        print("Hits: {0}".format(successful_hits))
+        print("Ships destroyed: {0}\n".format(ships_destroyed))
 
     def _display_boards(self) -> None:
         """ Displays the two players' boards by providing a toggle option to switch between the current or enemy
@@ -104,11 +131,10 @@ class BattleshipGame(Game):
         print("\nYou're looking at the other player's board.\n")
         # Provide the option to switch between boards or attack
         while True:
-            self._display_player_status()
+            self._display_player_status(enemy_board_displayed)
             player_input = self._get_toggle_input()
             # Print current player's board
             if player_input == "b" and enemy_board_displayed:
-                print("Your board:")
                 self.current_player_board.print(include_reference=True)
                 enemy_board_displayed = False
                 print("\nYou're looking at your board.\n")
@@ -119,13 +145,6 @@ class BattleshipGame(Game):
                 print("\nYou're looking at the other player's board.\n")
             elif player_input == "a":
                 break
-
-    def _display_player_status(self) -> None:
-        """ Prints out a status consisting of number of hits and ships destroyed """
-        successful_hits = self.hits_by_player[self.current_player.player_id]
-        ships_destroyed = self.ships_destroyed_by_player[self.current_player.player_id]
-        print("Hits: {0}".format(successful_hits))
-        print("Ships destroyed: {0}\n".format(ships_destroyed))
 
     def _tally_hit(self, successful_hit: bool, ship_destroyed: bool) -> None:
         """ Increments ship hit status by player based on given arguments

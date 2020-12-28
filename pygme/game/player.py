@@ -52,3 +52,12 @@ class Player(object):
     def wait_for_player_to_finish(self):
         """ Waits for the player to finish doing an action if this is being performed in another thread """
         self.thread.join()
+
+    def __eq__(self, other):
+        return self.player_id == other.player_id
+
+    def __ne__(self, other):
+        return self.player_id != other.player_id
+
+    def __hash__(self):
+        return hash(self.player_id)
