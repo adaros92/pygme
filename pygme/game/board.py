@@ -75,11 +75,12 @@ class GameBoard(object):
                     else:
                         row_string += self.empty_square
                     row_string += column_spacing
+                print(header + space + row_string + "\n")
             else:
                 row_string = " ".join([self.empty_square if (not self.board[square][i]
                                                              or self.board[square][i] in ignore_characters)
                                        else self.board[square][i] for square in range(self.length)])
-            print(header + space + row_string + "\n")
+                print(row_string)
 
     def clear(self) -> None:
         """ Clears the current board by replacing every square with the given empty square character """
