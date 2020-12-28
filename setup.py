@@ -1,20 +1,21 @@
+import pathlib
 
 from setuptools import setup, find_packages
 
 
 # The directory containing this file
-# HERE = pathlib.Path(__file__).parent
+HERE = pathlib.Path(__file__).parent
 
 # The text of the README file
-# README = (HERE / "README.md").read_text()
+README = (HERE / "README.md").read_text()
 
 
 setup(
     description='Lightweight computer games written in Python',
-    # long_description=README,
+    long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/adaros92/pygme",
-    version='0.1.0',
+    version='0.2.0',
     install_requires=['curtsies'],
     tests_require=['pytest', 'pytest-cov', 'tox', 'Random-Word'],
     license="MIT",
