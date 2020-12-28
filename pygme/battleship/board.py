@@ -7,7 +7,7 @@ from pygme.utils import space
 class BattleshipBoard(board.GameBoard):
     """ Implements specific battleship board functionality
 
-    Constructor arguments:
+    Constructor parameters:
 
     :param length - the length of the board to create
     :param width - the width of the board to create

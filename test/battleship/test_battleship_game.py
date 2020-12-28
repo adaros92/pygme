@@ -2,7 +2,7 @@ import pytest
 import random
 
 from pygme.game import player
-from pygme.battleship import game
+from pygme.battleship import game, board
 
 
 @pytest.fixture
@@ -20,11 +20,13 @@ def mock_game_input(monkeypatch) -> None:
 
 def test_assign_human_player():
     """ Tests _assign_human_player method in base Game class """
-    for _ in range(pytest.large_iteration_count):
+    for _ in range(pytest.small_iteration_count):
         # Start a test game and assign and create a random number of players
         test_game = game.BattleshipGame(config=pytest.battleship_test_config)
         test_game.number_of_players = random.randint(1, pytest.large_iteration_count)
-        test_game.players = [player.Player() for player_idx in range(test_game.number_of_players)]
+        test_game.players = [player.Player(
+            board.BattleshipBoard(pytest.large_iteration_count, pytest.large_iteration_count))
+            for player_idx in range(test_game.number_of_players)]
         # Assign exactly one human player among the list of players
         test_game._assign_human_player()
         count_of_computers, count_of_humans = 0, 0
@@ -39,11 +41,13 @@ def test_assign_human_player():
 
 def test_player_handling():
     """ Tests _next_player and _other_players methods in base Game class """
-    for _ in range(pytest.large_iteration_count):
+    for _ in range(pytest.small_iteration_count):
         # Start a test game and assign and create a random number of players
         test_game = game.BattleshipGame(config=pytest.battleship_test_config)
         test_game.number_of_players = random.randint(1, pytest.large_iteration_count)
-        test_game.players = [player.Player() for player_idx in range(test_game.number_of_players)]
+        test_game.players = [player.Player(
+            board.BattleshipBoard(pytest.large_iteration_count, pytest.large_iteration_count))
+            for player_idx in range(test_game.number_of_players)]
         for player_turn_iteration in range(4):
             seen_player_ids = set()
             # Keep getting the next player in line for as many players that exist in the game
@@ -58,11 +62,13 @@ def test_player_handling():
 
 def test_print_result():
     """ Tests print_result method in base Game class """
-    for _ in range(pytest.large_iteration_count):
+    for _ in range(pytest.small_iteration_count):
         # Start a test game and assign and create a random number of players
         test_game = game.BattleshipGame(config=pytest.battleship_test_config)
         test_game.number_of_players = random.randint(1, pytest.large_iteration_count)
-        test_game.players = [player.Player() for player_idx in range(test_game.number_of_players)]
+        test_game.players = [player.Player(
+            board.BattleshipBoard(pytest.large_iteration_count, pytest.large_iteration_count))
+            for player_idx in range(test_game.number_of_players)]
         test_game.players[0].winner = True
         # Ensure printing results doesn't raise exception under different random scenarios
         test_game.print_result()
@@ -77,7 +83,7 @@ def test_initialize(mock_game_input):
         # Ensure boards/fleets created successfully and difficulty correctly captures after game initialization
         assert (test_game.difficulty == "normal" and len(test_game.boards) == len(test_game.players) and
                 len(test_game.ship_fleets) == len(test_game.players))
-        for player_id, board in test_game.boards.items():
-            assert board.width == 20 and board.length == 20
+        for player_id, game_board in test_game.boards.items():
+            assert game_board.width == 20 and game_board.length == 20
         for player_id, fleet in test_game.ship_fleets.items():
             assert len(fleet) > 0

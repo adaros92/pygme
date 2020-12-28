@@ -7,10 +7,10 @@ class BattleshipGame(Game):
     def __init__(self,
                  config: dict, name: str = "Battleship", difficulty: str = "normal"):
         super().__init__(name, config, difficulty)
-        self.players = [player.BattleshipPlayer() for _ in range(self.number_of_players)]
+        self.players = []
         # Each player will have their own board and fleet of ships to play with
-        self.boards = {battleship_player.player_id: None for battleship_player in self.players}
-        self.ship_fleets = {battleship_player.player_id: ships.ShipFleet(config) for battleship_player in self.players}
+        self.boards = {}
+        self.ship_fleets = {}
         # These will change depending on the current turn
         self.current_player = None
         self.other_player = None
@@ -18,9 +18,9 @@ class BattleshipGame(Game):
         self.other_player_board = None
         self.other_player_fleet = None
         # These maintain current ship hit stats
-        self.hits_by_player = {battleship_player.player_id: 0 for battleship_player in self.players}
-        self.ships_destroyed_by_player = {
-            battleship_player.player_id: 0 for battleship_player in self.players}
+        self.hits_by_player = {}
+        self.ships_destroyed_by_player = {}
+        self.round_information = {}
 
     @staticmethod
     def construct_board(length: int, width: int, game_board: board.BattleshipBoard = None) -> board.BattleshipBoard:
@@ -50,21 +50,33 @@ class BattleshipGame(Game):
 
         :param initialization_object - a dictionary containing starting parameters to run the game with
         """
-        # Assign a random player to be the human player
-        self._assign_human_player()
         # Get input from the user if no initialization_object is provided
         initialization_object = self._get_user_input(initialization_object)
         board_width = initialization_object["board_width"]
         board_length = initialization_object["board_length"]
-        difficulty = initialization_object["difficulty"]
-        self.boards = {player_id: self.construct_board(board_length, board_width)
-                       for player_id, _ in self.boards.items()}
-        for player_obj in self.players:
-            player_id = player_obj.player_id
+        self.difficulty = initialization_object["difficulty"]
+        # Create boards and fleets
+        board_list = [self.construct_board(board_length, board_width) for _ in range(self.number_of_players)]
+        fleet_list = [ships.ShipFleet(self.config) for _ in range(self.number_of_players)]
+        # Create players and associate boards, fleets, and round information objects with each one
+        for idx in range(self.number_of_players):
+            player_obj = player.BattleshipPlayer(board_list[idx], difficulty=self.difficulty)
+            self.players.append(player_obj)
             player_obj.place_ships(
-                fleet=self.ship_fleets[player_id],
-                game_board=self.boards[player_id]
+                fleet=fleet_list[idx],
             )
+            self.boards[player_obj.player_id] = board_list[idx]
+            self.ship_fleets[player_obj.player_id] = fleet_list[idx]
+            self.hits_by_player[player_obj.player_id] = 0
+            self.ships_destroyed_by_player[player_obj.player_id] = 0
+            self.round_information[player_obj.player_id] = {
+                "coordinate": None,
+                "successful_hit": False,
+                "ship_destroyed": False,
+                "already_hit": False
+            }
+        # Assign a random player to be the human player
+        self._assign_human_player()
 
     def _is_game_over(self) -> bool:
         """ Checks whether the game has finished and determines a winner
@@ -140,10 +152,11 @@ class BattleshipGame(Game):
             if not already_hit:
                 # Get the players involved and resolve the current turn
                 self.current_player = self._next_player()
+                current_player_id = self.current_player.player_id
                 other_players = self._other_players()
                 assert (len(other_players) == 1)
                 self.other_player = other_players[0]
-                self.current_player_board = self.boards[self.current_player.player_id]
+                self.current_player_board = self.boards[current_player_id]
                 # Get other player's information
                 self.other_player_board = self.boards[self.other_player.player_id]
                 self.other_player_fleet = self.ship_fleets[self.other_player.player_id]
@@ -151,9 +164,14 @@ class BattleshipGame(Game):
             if not self.current_player.computer:
                 self._display_boards()
             # Attack fleet
-            attack_coordinate = self.current_player.guess(self.current_player_board)
+            attack_coordinate = self.current_player.guess(self.round_information[current_player_id])
             successful_hit, ship_destroyed, already_hit = self.other_player_board.attack(
                 attack_coordinate, self.other_player_fleet)
+            # Keep track of round status to inform next strategy
+            self.round_information[current_player_id]["coordinate"] = attack_coordinate
+            self.round_information[current_player_id]["successful_hit"] = successful_hit
+            self.round_information[current_player_id]["ship_destroyed"] = ship_destroyed
+            self.round_information[current_player_id]["already_hit"] = already_hit
             # Keep track of successful hits and ships destroyed
             self._tally_hit(successful_hit, ship_destroyed)
         self.print_result()

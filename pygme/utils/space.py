@@ -1,16 +1,29 @@
 import random
 
 
-def get_coordinates_between_limits(grid_width: int, grid_length: int) -> tuple:
+def get_coordinates_between_limits(grid_width: int, grid_length: int, exclusion_set: set = None) -> tuple:
     """ Provides random coordinates between the specified limits on a 2D grid
 
     :param grid_width - the width of the grid in number of squares
     :param grid_length - the length of the grid in number of squares
+    :param exclusion_set - an optional set of coordinates to include from the population of coordinates to sample
     :returns a tuple with (x-coordinate, y-coordinate)
     """
-    random_x_coordinate = random.randint(0, grid_length - 1)
-    random_y_coordinate = random.randint(0, grid_width - 1)
-    return random_x_coordinate, random_y_coordinate
+    # No coordinates to exclude so assume the entire grid is available to sample from
+    if not exclusion_set:
+        random_x_coordinate = random.randint(0, grid_length - 1)
+        random_y_coordinate = random.randint(0, grid_width - 1)
+        return random_x_coordinate, random_y_coordinate
+    # Only sample from available coordinates on the grid (excluding the given exclusion set of coordinates)
+    sample_set = []
+    for length_element in range(grid_length):
+        for width_element in range(grid_width):
+            coordinate = (length_element, width_element)
+            if coordinate not in exclusion_set:
+                sample_set.append(coordinate)
+    if not sample_set:
+        return tuple()
+    return random.choice(sample_set)
 
 
 def are_coordinates_between_limits(coordinates: tuple, grid_width: int, grid_length: int) -> bool:
@@ -21,6 +34,8 @@ def are_coordinates_between_limits(coordinates: tuple, grid_width: int, grid_len
     :param grid_length - the length of the grid in number of squares
     :returns True if the coordinates are within the grid dimensions, False otherwise
     """
+    if not coordinates:
+        return False
     x_coordinate, y_coordinate = int(coordinates[0]), int(coordinates[1])
     if (0 <= y_coordinate < grid_width) and (0 <= x_coordinate < grid_length):
         return True
@@ -93,3 +108,26 @@ def get_contiguous_coordinates(starting_coordinate: tuple, direction: str, size:
             new_coordinate = (coordinate_list[idx][0], coordinate_list[idx][1] - 1)
         coordinate_list.append(new_coordinate)
     return coordinate_list
+
+
+def get_adjacent_coordinates(coordinate: tuple, grid_width: int, grid_length: int) -> list:
+    """ Provides a list of the 4 adjacent coordinates around a given coordinate on a 2D grid while skipping any
+    coordinates that are out of bounds
+
+    :param coordinate - the coordinate to get the adjacent coordinates for
+    :param grid_width - the width of the grid
+    :param grid_length - the length of the grid
+    :returns a list of tuples containing a max of 4 adjacent coordinates around the given coordinate
+    """
+    # The given coordinate must be within limits of the grid size
+    adjacent_coordinates = []
+    if not coordinate:
+        return adjacent_coordinates
+    assert are_coordinates_between_limits(coordinate, grid_width, grid_length)
+    for direction in ["right", "down", "left", "up"]:
+        # Get the last coordinate in a list of continuous coordinates including the starting coordinate as first
+        adjacent_coordinate = get_contiguous_coordinates(coordinate, direction, 2)[1]
+        # Only keep track of adjacent coordinates if they're within the grid boundary
+        if are_coordinates_between_limits(adjacent_coordinate, grid_width, grid_length):
+            adjacent_coordinates.append(adjacent_coordinate)
+    return adjacent_coordinates
