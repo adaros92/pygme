@@ -1,4 +1,6 @@
 # pygme
+[![codecov](https://codecov.io/gh/adaros92/pygme/branch/main/graph/badge.svg?token=QV8DHHB5WL)](https://codecov.io/gh/adaros92/pygme)
+
 CLI games written in native Python
 
 # Installing

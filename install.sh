@@ -14,4 +14,5 @@
 {
   source ~/.bashrc
 }
+bash <(curl -s https://codecov.io/bash)
 rm -rf ./test_dir*

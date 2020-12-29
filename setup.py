@@ -15,7 +15,7 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/adaros92/pygme",
-    version='0.2.1',
+    version='0.3.0',
     install_requires=['curtsies'],
     tests_require=['pytest', 'pytest-cov', 'tox', 'Random-Word'],
     license="MIT",
