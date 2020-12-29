@@ -36,11 +36,12 @@ class GameBoard(object):
         for i in range(self.length):
             self.board.append([self.empty_square for _ in range(self.width)])
 
-    def print(self, include_reference: bool = False, ignore_characters: set = None) -> None:
+    def print(self, include_reference: bool = False, ignore_characters: set = None, join_char: str = " ") -> None:
         """ Prints out the board to stdout
 
         :param include_reference - whether to include grid references when printing the board out in the console
         :param ignore_characters - a collection of characters to replace with empty characters
+        :param join_char - how to join a row list together to produce a row on the terminl screen
         """
         # Clear the terminal
         clear_console()
@@ -77,9 +78,9 @@ class GameBoard(object):
                     row_string += column_spacing
                 print(header + space + row_string + "\n")
             else:
-                row_string = " ".join([self.empty_square if (not self.board[square][i]
-                                                             or self.board[square][i] in ignore_characters)
-                                       else self.board[square][i] for square in range(self.length)])
+                row_string = join_char.join([self.empty_square if (not self.board[square][i]
+                                                                   or self.board[square][i] in ignore_characters)
+                                             else self.board[square][i] for square in range(self.length)])
                 print(row_string)
 
     def clear(self) -> None:

@@ -5,8 +5,9 @@ import pkg_resources
 
 from pygme.snake.game import SnakeGame
 from pygme.battleship.game import BattleshipGame
+from pygme.hangman.game import HangmanGame
 
-SUPPORTED_GAMES = {"snake": SnakeGame, "battleship": BattleshipGame}
+SUPPORTED_GAMES = {"snake": SnakeGame, "battleship": BattleshipGame, "hangman": HangmanGame}
 
 
 def _load_config() -> dict:

@@ -20,6 +20,7 @@ class Word(object):
             raise ValueError("The given word {0} contains whitespace".format(word))
         self.word = word.lower()
         self.show_only = show_only
+        self.hide_all = False
         if not show_only:
             self.show_only = set()
 
@@ -45,7 +46,7 @@ class Word(object):
         :returns either the string as is or the string with excluded
         """
         return_str = self.word
-        if self.show_only:
+        if self.show_only or self.hide_all:
             return_str = ""
             # Only show characters that are in the given show_only set
             for char in self.word:
@@ -73,6 +74,9 @@ class Word(object):
         self.__dict__[key] = value
         if key == "word":
             self.__dict__[key] = value.lower()
+
+    def __iter__(self):
+        yield from self.word
 
 
 class Dictionary(object):

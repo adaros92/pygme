@@ -16,5 +16,14 @@ def pytest_configure():
         "required_inputs": {"board_width": "int", "board_length": "int", "difficulty": "str"},
         "number_of_players": 2
     }
+    pytest.hangman_test_config = {
+        "dictionary_filename": "dictionary.txt", "required_inputs": {"difficulty": "str"},
+        "number_of_players": 1, "board_width": 10, "board_length": 10,
+        "word_sizes_by_difficulty": {
+          "easy": {"min_word_length": 2, "max_word_length": 4},
+          "normal": {"min_word_length": 5, "max_word_length": 8},
+          "hard": {"min_word_length": 9, "max_word_length": 100}
+        }
+    }
     pytest.default_dictionary_config = {"dictionary_filename": "dictionary.txt"}
 

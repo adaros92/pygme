@@ -42,7 +42,8 @@ class BattleshipGame(Game):
         """
         self._validate_base(initialization_object)
         # A default game of Battleship includes an 8x8 board
-        assert initialization_object["board_width"] >= 8 and initialization_object["board_length"] >= 8
+        assert (initialization_object["board_width"] >= self.config["minimum_board_width"]
+                and initialization_object["board_length"] >= self.config["minimum_board_length"])
 
     def _initialize(self, initialization_object: dict = None) -> None:
         """ Initializes the game of battleship by choosing a human player, receiving input about the size of the
